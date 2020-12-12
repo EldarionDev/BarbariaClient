@@ -8,13 +8,6 @@ pub struct Engine {
     graphic_engine: graphics::Graphic,
 }
 
-impl Drop for Engine {
-    fn drop(&mut self) {
-        info!("Terminating the Barbaria Engine!");
-        drop(&self.glfw_instance);
-    }
-}
-
 impl Engine {
     pub fn new() -> Result<Self, Box<dyn Error>> {
         info!("Starting the Barbaria Engine!");
@@ -24,5 +17,16 @@ impl Engine {
             glfw_instance: gli,
             graphic_engine: gre?,
         })
+    }
+
+    pub fn do_engine_tick(&mut self) {
+        self.graphic_engine.do_render_tick();
+    }
+}
+
+impl Drop for Engine {
+    fn drop(&mut self) {
+        info!("Terminating the Barbaria Engine!");
+        drop(&self.glfw_instance);
     }
 }

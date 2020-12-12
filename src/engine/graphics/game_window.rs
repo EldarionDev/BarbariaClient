@@ -1,3 +1,5 @@
+use glfw::Context;
+
 pub struct GameWindow {
     resolution: (u32, u32),
     title: String,
@@ -19,6 +21,10 @@ impl GameWindow {
             title: window_title.to_string(),
             glfw_window: window,
         })
+    }
+
+    pub fn update_window(&mut self) {
+        self.glfw_window.swap_buffers();
     }
 }
 
