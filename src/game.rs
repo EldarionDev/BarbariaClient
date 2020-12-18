@@ -1,5 +1,7 @@
 use crate::{info};
 
+mod world;
+
 pub fn start_client () {
     info!("Starting the game client.");
 }
