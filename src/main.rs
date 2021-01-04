@@ -1,18 +1,20 @@
-mod logger;
+use std::env;
+
+mod resource_manager;
 mod game;
 mod engine;
 
+struct Config {
+    resource_manager: resource_manager::ResourceManager,
+}
+
 fn main() {
-    info!("Entering Middle-earth...");
-    game::start_client();
-    let mut barbaria_engine = engine::Engine::new().unwrap();
-    loop {
-        barbaria_engine.do_engine_tick();
-        unsafe{
-            gl::ClearColor(0.5, 0.3, 0.4, 1.0);
-            gl::Clear(gl::COLOR_BUFFER_BIT); 
-        }
-    }
-    game::end_client();
-    info!("Sailing to Valinor...");
+    let cmd_args: Vec<String> = env::args().collect();
+
+    let asset_path: &str = &cmd_args[1];
+    let config_path: &str = &cmd_args[2];
+
+    let program_config = Config {
+        resource_manager: resource_manager::ResourceManager::new(asset_path, config_path)
+    };
 }

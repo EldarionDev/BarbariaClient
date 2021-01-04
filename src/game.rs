@@ -1,19 +1,26 @@
-use crate::{info};
+mod faction;
+mod map;
 
-mod world;
-
-pub fn start_client () {
-    info!("Starting the game client.");
+struct Game {
+    /* Remove Option when JSON loading is implemented */
+    factions: Option<Vec<faction::Faction>>,
+    map: Option<map::Map>
 }
 
-pub fn start_server () {
-    info!("Starting the game server.");
-}
+impl Game {
+    pub fn new() -> Self{
+        /* Temporary till JSON loading */
+        Game {
+            factions: None,
+            map: None
+        }
+    }
 
-pub fn end_client () {
-    info!("Terminating the game client.");
-}
+    pub fn load_world() {
 
-pub fn end_server () {
-    info!("Terminating the game server.");
+    }
+
+    pub fn save_world() {
+
+    }
 }
