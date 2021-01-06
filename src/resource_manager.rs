@@ -3,11 +3,12 @@ use std::io;
 
 /* Asset path contains all assets. Config path contains the game config while data path contains
 the object information. */
+#[derive(Clone)]
 pub struct ResourceManager {
     asset_path: String,
     config_path: String,
     data_path: String,
-    world_path: Option<&'static str>
+    world_path: Option<String>
 }
 
 impl ResourceManager {
@@ -20,8 +21,12 @@ impl ResourceManager {
         }
     }
 
-    pub fn set_world(mut self, world_path: &'static str) {
-        self.world_path = Some(world_path);
+    pub fn set_world(&mut self, world_path: &str) {
+        self.world_path = Some(world_path.to_owned());
+    }
+
+    pub fn get_world(self) -> String{
+        return self.world_path.unwrap().clone();
     }
 
     /* Functions to return the asset paths */
@@ -42,7 +47,7 @@ impl ResourceManager {
 
     /* Functions to return world data */
     pub fn get_world_data(self, data_name: &str) -> Vec<String> {
-        let world_data_path = match self.world_path {
+        let world_data_path = match &self.world_path {
             None => panic!("World has not yet been initialized, but attempted to load data from it"),
             Some(i) => i
         }.to_string() + "/" + data_name + "/";
@@ -50,7 +55,7 @@ impl ResourceManager {
         return self.get_dir_files(&world_data_path);
     }
 
-    fn get_dir_files<'a>(self, path: &str) -> Vec<String>{
+    fn get_dir_files<'b>(self, path: &str) -> Vec<String>{
         
         let files = match fs::read_dir(path) {
             Err(_) => panic!("Shader directory could not be opened!"),
