@@ -5,28 +5,30 @@ use super::Config;
 mod faction;
 mod map;
 
-pub struct Game {
+pub struct Game<'a> {
     /* Remove Option when JSON loading is implemented */
     factions: Option<Vec<faction::Faction>>,
     map: Option<map::Map>,
-    paths:  Config
+    paths: &'a Config
 }
 
-impl Game {
-    pub fn new(paths: &Config) -> Self{
+impl<'a> Game<'a> {
+    pub fn new(paths: &'a Config) -> Self{
         /* Temporary till JSON loading */
         Game {
             factions: None,
             map: None,
-            paths: paths.clone()
+            paths: paths
         }
     }
 
-    pub fn load_world() {
-
+    pub fn load_world(&self) {
+        for faction_file in self.paths.resource_manager.get_world_data("factions") {
+            println!("test: {}", faction_file);
+        }
     }
 
-    pub fn save_world(self) {
+    pub fn save_world(&self) {
         let file = File::create(self.paths.resource_manager.get_world().to_owned() + "test_faction.json");
         let f = faction::Faction::new("Hello there".to_string());
         let json_data = serde_json::to_string(&f);

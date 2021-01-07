@@ -4,7 +4,6 @@ mod resource_manager;
 mod game;
 mod engine;
 
-#[derive(Clone)]
 pub struct Config {
     resource_manager: resource_manager::ResourceManager,
 }
@@ -29,5 +28,6 @@ fn main() {
 
     let game_engine = engine::Engine::new();
     let game = game::Game::new(&program_config);
+    game.load_world();
     game.save_world();
 }
