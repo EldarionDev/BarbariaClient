@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write};
+use std::{fs, fs::File, io::Write};
 
 use super::Config;
 
@@ -24,7 +24,9 @@ impl<'a> Game<'a> {
 
     pub fn load_world(&self) {
         for faction_file in self.paths.resource_manager.get_world_data("factions") {
-            println!("test: {}", faction_file);
+            let faction_file_content: String = fs::read_to_string(faction_file).unwrap().parse().unwrap();
+            let faction_file_content: &str = &faction_file_content[..];
+            let faction: faction::Faction = serde_json::from_str(faction_file_content).unwrap();
         }
     }
 
