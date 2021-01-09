@@ -11,7 +11,8 @@ pub enum ObjectClass {
     Settlement,
     Army,
     Lake,
-    Terrain
+    Terrain,
+    GUI
 }
 
 pub enum ObjectType {
@@ -65,22 +66,23 @@ impl<'b> Object<'b> {
 
         match dimension {
             ObjectType::Dimension2 => {
-                shader_name += "2d_";
-                projection_name += "2d_default";
-                camera_name += "2d_default"
+                shader_name += "2d_default";
+                projection_name += "2d_default.json";
+                camera_name += "2d_default.json"
             }
             ObjectType::Dimension3 => {
-                shader_name += "3d_";
-                projection_name += "3d_default";
-                camera_name += "3d_default"
+                shader_name += "3d_default";
+                projection_name += "3d_default.json";
+                camera_name += "3d_default.json"
             }
         }
 
         match class {
-            ObjectClass::Army => shader_name += "army_",
-            ObjectClass::Lake => shader_name += "lake_",
-            ObjectClass::Settlement => shader_name += "settlement_",
-            ObjectClass::Terrain => shader_name += "terrain_"
+            ObjectClass::Army => shader_name += "_army",
+            ObjectClass::Lake => shader_name += "_lake",
+            ObjectClass::Settlement => shader_name += "_settlement",
+            ObjectClass::Terrain => shader_name += "_terrain",
+            ObjectClass::GUI => shader_name += "_gui"
         }
 
         let shader_ref: &'b shader::Shader = match graphic.shaders.get_mut(&shader_name) {

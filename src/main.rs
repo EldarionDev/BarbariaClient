@@ -26,8 +26,16 @@ fn main() {
     };
     program_config.resource_manager.set_world("world/");
 
-    let game_engine = engine::Engine::new();
+    let mut game_engine = engine::Engine::new(&program_config);
     let game = game::Game::new(&program_config);
     game.load_world();
     game.save_world();
+
+    loop {
+        unsafe {
+            gl::ClearColor(0.6, 0.3, 0.2, 1.0);
+            gl::Clear(gl::COLOR_BUFFER_BIT);
+        }
+        game_engine.render_tick();
+    }
 }

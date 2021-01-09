@@ -31,7 +31,7 @@ impl ResourceManager {
 
     /* Functions to return the asset paths */
     pub fn get_assets(&self, assets_name: &str) -> Vec<String> {
-        let shader_path =  self.asset_path.to_string() + "/" + assets_name + "/";
+        let shader_path =  self.asset_path.to_string() + assets_name + "/";
         return self.get_dir_files(&shader_path);
     }
 
@@ -41,7 +41,7 @@ impl ResourceManager {
     }
 
     pub fn get_data(&self, data_name: &str) -> Vec<String> {
-        let unit_path = self.data_path.to_string() + "/" + data_name + "/";
+        let unit_path = self.data_path.to_string() + data_name + "/";
         return self.get_dir_files(&unit_path);
     }
 
