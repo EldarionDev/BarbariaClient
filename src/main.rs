@@ -3,6 +3,7 @@ use std::{clone, env};
 mod resource_manager;
 mod game;
 mod engine;
+mod maths;
 
 pub struct Config {
     resource_manager: resource_manager::ResourceManager,
