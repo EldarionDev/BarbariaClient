@@ -73,12 +73,15 @@ impl Shader {
             }
         }
 
+        /* Assign values and return */
         Shader {
             shader_program
         }
     }
 
     pub fn bind(&self) {
-
+        unsafe {
+            gl::UseProgram(self.shader_program);
+        }
     }
 }
