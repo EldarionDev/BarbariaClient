@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use crate::Config;
 
 mod animation;
 mod camera;
@@ -25,17 +26,75 @@ pub struct Graphic {
     cameras: HashMap<String, camera::Camera>,
     models: HashMap<String, model::Model>,
     projections: HashMap<String, projection::Projection>,
-    shaders: HashMap<String, shader::Shader>
+    shaders: HashMap<String, shader::Shader>,
+    textures: HashMap<String, texture::Texture>
 }
 
 impl Graphic {
-    pub fn new() -> Self{
+    pub fn new(paths: Config) -> Self{
+        let mut animations: HashMap<String, animation::Animation> = HashMap::new();
+        let mut cameras: HashMap<String, camera::Camera> = HashMap::new();
+        let mut models: HashMap<String, model::Model> = HashMap::new();
+        let mut projections: HashMap<String, projection::Projection> = HashMap::new();
+        let mut shaders: HashMap<String, shader::Shader> = HashMap::new();
+        let mut textures: HashMap<String, texture::Texture> = HashMap::new();
+
+        for (i, x) in paths.resource_manager.get_assets("animations").iter().enumerate() {
+            let mut splitted_string = x.split('/');
+            let mut splitted_string = splitted_string.last().unwrap();
+            let mut splitted_string = splitted_string.split('.');
+            let splitted_string = splitted_string.next().unwrap();
+            animations.insert(splitted_string.to_string(), animation::Animation::new(x));
+        }
+
+        for (i, x) in paths.resource_manager.get_assets("cameras").iter().enumerate() {
+            let mut splitted_string = x.split('/');
+            let mut splitted_string = splitted_string.last().unwrap();
+            let mut splitted_string = splitted_string.split('.');
+            let splitted_string = splitted_string.next().unwrap();
+            cameras.insert(splitted_string.to_string(), camera::Camera::new(x));
+        }
+
+        for (i, x) in paths.resource_manager.get_assets("models").iter().enumerate() {
+            let mut splitted_string = x.split('/');
+            let mut splitted_string = splitted_string.last().unwrap();
+            let mut splitted_string = splitted_string.split('.');
+            let splitted_string = splitted_string.next().unwrap();
+            models.insert(splitted_string.to_string(), model::Model::new(x.to_string()));
+        }
+
+        for (i, x) in paths.resource_manager.get_assets("projections").iter().enumerate() {
+            let mut splitted_string = x.split('/');
+            let mut splitted_string = splitted_string.last().unwrap();
+            let mut splitted_string = splitted_string.split('.');
+            let splitted_string = splitted_string.next().unwrap();
+            projections.insert(splitted_string.to_string(), projection::Projection::new(x));
+        }
+
+        for (i, x) in paths.resource_manager.get_assets("shaders").iter().enumerate() {
+            let mut splitted_string = x.split('/');
+            let mut splitted_string = splitted_string.last().unwrap();
+            let mut splitted_string = splitted_string.split('.');
+            let splitted_string = splitted_string.next().unwrap();
+            if shaders.contains_key(splitted_string) {continue};
+            shaders.insert(splitted_string.to_string(), shader::Shader::new(x.to_string()));
+        }
+
+        for (i, x) in paths.resource_manager.get_assets("textures").iter().enumerate() {
+            let mut splitted_string = x.split('/');
+            let mut splitted_string = splitted_string.last().unwrap();
+            let mut splitted_string = splitted_string.split('.');
+            let splitted_string = splitted_string.next().unwrap();
+            textures.insert(splitted_string.to_string(), texture::Texture::new(x.to_string()));
+        }
+
         Graphic {
-            animations: HashMap::new(),
-            cameras: HashMap::new(),
-            models: HashMap::new(),
-            projections: HashMap::new(),
-            shaders: HashMap::new()
+            animations,
+            cameras,
+            models,
+            projections,
+            shaders,
+            textures
         }
     }
 
@@ -43,6 +102,7 @@ impl Graphic {
         obj.shader.bind();
         obj.projection.bind(obj.shader);
         obj.camera.bind(obj.shader);
+        obj.texture.bind();
         obj.model.bind();
         obj.model.draw();
     }
@@ -55,7 +115,8 @@ pub struct Object<'b> {
     shader: &'b shader::Shader,
     camera: &'b camera::Camera,
     projection: &'b projection::Projection,
-    model: &'b model::Model
+    model: &'b model::Model,
+    texture: &'b texture::Texture
 }
 
 impl<'b> Object<'b> {
@@ -63,17 +124,20 @@ impl<'b> Object<'b> {
         let mut shader_name: String = String::new();
         let mut projection_name: String = String::new();
         let mut camera_name: String = String::new();
+        let mut model_name = name.to_string() + ".pmf";
+        let mut texture_name = name.to_string() + ".tga";
 
         match dimension {
             ObjectType::Dimension2 => {
                 shader_name += "2d_default";
                 projection_name += "2d_default.json";
-                camera_name += "2d_default.json"
+                camera_name += "2d_default.json";
+                model_name = "gui_default.pmf".to_string();
             }
             ObjectType::Dimension3 => {
                 shader_name += "3d_default";
                 projection_name += "3d_default.json";
-                camera_name += "3d_default.json"
+                camera_name += "3d_default.json";
             }
         }
 
@@ -100,8 +164,13 @@ impl<'b> Object<'b> {
             Some(i) => i
         };
 
-        let model_ref: &'b model::Model = match graphic.models.get_mut(name) {
-            None => panic!("Specified model: {} could not be referenced while creating instance of: {}", name, name),
+        let model_ref: &'b model::Model = match graphic.models.get_mut(&model_name) {
+            None => panic!("Specified model: {} could not be referenced while creating instance of: {}", model_name, name),
+            Some(i) => i
+        };
+
+        let texture_ref: &'b texture::Texture = match graphic.textures.get_mut(&texture_name) {
+            None => panic!("Specified texture: {} could not be referenced while creating instance of: {}", texture_name, name),
             Some(i) => i
         };
 
@@ -112,7 +181,8 @@ impl<'b> Object<'b> {
             shader: shader_ref,
             camera: camera_ref,
             projection: projection_ref,
-            model: model_ref
+            model: model_ref,
+            texture: texture_ref
         }
     }
 }
