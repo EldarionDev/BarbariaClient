@@ -1,5 +1,6 @@
 use std::{ffi::CString, fs, ptr};
 
+#[derive(Clone)]
 pub struct Shader {
     shader_program: u32
 }

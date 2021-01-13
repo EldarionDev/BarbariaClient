@@ -1,5 +1,6 @@
 use super::shader::Shader;
 
+#[derive(Clone)]
 pub struct Camera {
     
 }

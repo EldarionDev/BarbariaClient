@@ -5,6 +5,7 @@ use super::Config;
 mod faction;
 mod map;
 
+#[derive(Clone)]
 pub struct Game<'a> {
     /* Remove Option when JSON loading is implemented */
     factions: Option<Vec<faction::Faction>>,

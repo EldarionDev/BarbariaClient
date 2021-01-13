@@ -1,6 +1,7 @@
 use std::{ffi::c_void, path::Path};
 use image::GenericImage;
 
+#[derive(Clone)]
 pub struct Texture {
     texture_id: u32
 }

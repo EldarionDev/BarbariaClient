@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 
 mod unit;
 
-#[derive (Serialize, Deserialize)]
+#[derive (Serialize, Deserialize, Clone)]
 pub struct Army {
     units: Option<Vec<unit::Unit>>
 }

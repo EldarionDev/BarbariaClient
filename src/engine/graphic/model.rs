@@ -19,6 +19,7 @@ struct ModelVertex {
     textureY: f64
 }
 
+#[derive(Clone)]
 pub struct Model {
     vertex_array_object: u32,
     vertex_buffer_object: u32,

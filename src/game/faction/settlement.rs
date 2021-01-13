@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 
 mod building;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Settlement {
     buildings: Option<Vec<building::Building>>
 }

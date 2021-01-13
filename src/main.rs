@@ -28,6 +28,7 @@ fn main() {
     program_config.resource_manager.set_world("world/");
 
     let mut game_engine = engine::Engine::new(&program_config);
+    game_engine.open_title_screen();
     let game = game::Game::new(&program_config);
     game.load_world();
     game.save_world();

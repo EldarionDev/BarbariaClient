@@ -4,7 +4,7 @@ use serde_json::Result;
 mod army;
 mod settlement;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Faction {
     name: String,
     armies: Option<Vec<army::Army>>,

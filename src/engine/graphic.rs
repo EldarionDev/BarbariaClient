@@ -8,6 +8,7 @@ mod projection;
 mod shader;
 mod texture;
 
+#[derive(Clone)]
 pub enum ObjectClass {
     Settlement,
     Army,
@@ -16,11 +17,13 @@ pub enum ObjectClass {
     GUI
 }
 
+#[derive(Clone)]
 pub enum ObjectType {
     Dimension2,
     Dimension3
 }
 
+#[derive(Clone)]
 pub struct Graphic {
     animations: HashMap<String, animation::Animation>,
     cameras: HashMap<String, camera::Camera>,
@@ -31,7 +34,7 @@ pub struct Graphic {
 }
 
 impl Graphic {
-    pub fn new(paths: Config) -> Self{
+    pub fn new(paths: &Config) -> Self{
         let mut animations: HashMap<String, animation::Animation> = HashMap::new();
         let mut cameras: HashMap<String, camera::Camera> = HashMap::new();
         let mut models: HashMap<String, model::Model> = HashMap::new();
@@ -42,32 +45,24 @@ impl Graphic {
         for (i, x) in paths.resource_manager.get_assets("animations").iter().enumerate() {
             let mut splitted_string = x.split('/');
             let mut splitted_string = splitted_string.last().unwrap();
-            let mut splitted_string = splitted_string.split('.');
-            let splitted_string = splitted_string.next().unwrap();
             animations.insert(splitted_string.to_string(), animation::Animation::new(x));
         }
 
         for (i, x) in paths.resource_manager.get_assets("cameras").iter().enumerate() {
             let mut splitted_string = x.split('/');
             let mut splitted_string = splitted_string.last().unwrap();
-            let mut splitted_string = splitted_string.split('.');
-            let splitted_string = splitted_string.next().unwrap();
             cameras.insert(splitted_string.to_string(), camera::Camera::new(x));
         }
 
         for (i, x) in paths.resource_manager.get_assets("models").iter().enumerate() {
             let mut splitted_string = x.split('/');
             let mut splitted_string = splitted_string.last().unwrap();
-            let mut splitted_string = splitted_string.split('.');
-            let splitted_string = splitted_string.next().unwrap();
             models.insert(splitted_string.to_string(), model::Model::new(x.to_string()));
         }
 
         for (i, x) in paths.resource_manager.get_assets("projections").iter().enumerate() {
             let mut splitted_string = x.split('/');
             let mut splitted_string = splitted_string.last().unwrap();
-            let mut splitted_string = splitted_string.split('.');
-            let splitted_string = splitted_string.next().unwrap();
             projections.insert(splitted_string.to_string(), projection::Projection::new(x));
         }
 
@@ -77,14 +72,12 @@ impl Graphic {
             let mut splitted_string = splitted_string.split('.');
             let splitted_string = splitted_string.next().unwrap();
             if shaders.contains_key(splitted_string) {continue};
-            shaders.insert(splitted_string.to_string(), shader::Shader::new(x.to_string()));
+            shaders.insert(splitted_string.to_string(), shader::Shader::new(x.split('.').next().unwrap().to_string()));
         }
 
         for (i, x) in paths.resource_manager.get_assets("textures").iter().enumerate() {
             let mut splitted_string = x.split('/');
             let mut splitted_string = splitted_string.last().unwrap();
-            let mut splitted_string = splitted_string.split('.');
-            let splitted_string = splitted_string.next().unwrap();
             textures.insert(splitted_string.to_string(), texture::Texture::new(x.to_string()));
         }
 
@@ -98,29 +91,7 @@ impl Graphic {
         }
     }
 
-    pub fn draw(mut self, obj: Object) {
-        obj.shader.bind();
-        obj.projection.bind(obj.shader);
-        obj.camera.bind(obj.shader);
-        obj.texture.bind();
-        obj.model.bind();
-        obj.model.draw();
-    }
-}
-
-pub struct Object<'b> {
-    object_name: String,
-    class: ObjectClass,
-    dimension: ObjectType,
-    shader: &'b shader::Shader,
-    camera: &'b camera::Camera,
-    projection: &'b projection::Projection,
-    model: &'b model::Model,
-    texture: &'b texture::Texture
-}
-
-impl<'b> Object<'b> {
-    pub fn new(graphic: &'b mut Graphic, name: &str, dimension: ObjectType, class: ObjectClass) -> Self {
+    pub fn create_object(&self, name: &str, dimension: ObjectType, class: ObjectClass) -> Object {
         let mut shader_name: String = String::new();
         let mut projection_name: String = String::new();
         let mut camera_name: String = String::new();
@@ -132,7 +103,7 @@ impl<'b> Object<'b> {
                 shader_name += "2d_default";
                 projection_name += "2d_default.json";
                 camera_name += "2d_default.json";
-                model_name = "gui_default.pmf".to_string();
+                model_name = "2d_default.pmf".to_string();
             }
             ObjectType::Dimension3 => {
                 shader_name += "3d_default";
@@ -149,40 +120,62 @@ impl<'b> Object<'b> {
             ObjectClass::GUI => shader_name += "_gui"
         }
 
-        let shader_ref: &'b shader::Shader = match graphic.shaders.get_mut(&shader_name) {
+        let shader_ref: shader::Shader = match self.shaders.get(&shader_name) {
             None => panic!("Specified shader: {} could not be referenced while creating instance of: {}", shader_name, name),
-            Some(i) => i
+            Some(i) => i.to_owned()
         };
 
-        let camera_ref: &'b camera::Camera = match graphic.cameras.get_mut(&camera_name) {
+        /*let camera_ref: camera::Camera = match self.cameras.get(&camera_name) {
             None => panic!("Specified camera: {} could not be referenced while creating instance of: {}", camera_name, name),
-            Some(i) => i
-        };
+            Some(i) => i.to_owned()
+        }; */
 
-        let projection_ref: &'b projection::Projection = match graphic.projections.get_mut(&camera_name) {
+        /* let projection_ref: projection::Projection = match self.projections.get(&camera_name) {
             None => panic!("Specified projection: {} could not be referenced while creating instance of: {}", projection_name, name),
-            Some(i) => i
-        };
+            Some(i) => i.to_owned()
+        }; */
 
-        let model_ref: &'b model::Model = match graphic.models.get_mut(&model_name) {
+        let model_ref: model::Model = match self.models.get(&model_name) {
             None => panic!("Specified model: {} could not be referenced while creating instance of: {}", model_name, name),
-            Some(i) => i
+            Some(i) => i.to_owned()
         };
 
-        let texture_ref: &'b texture::Texture = match graphic.textures.get_mut(&texture_name) {
+        let texture_ref: texture::Texture = match self.textures.get(&texture_name) {
             None => panic!("Specified texture: {} could not be referenced while creating instance of: {}", texture_name, name),
-            Some(i) => i
+            Some(i) => i.to_owned()
         };
 
         Object {
             object_name: name.to_string(),
             class,
             dimension,
-            shader: shader_ref,
-            camera: camera_ref,
-            projection: projection_ref,
+            shader:  shader_ref,
+            camera: camera::Camera::new("bef"),
+            projection: projection::Projection::new("test"),
             model: model_ref,
             texture: texture_ref
         }
     }
+
+    pub fn draw(mut self, obj: Object) {
+        obj.shader.bind();
+        obj.projection.bind(&obj.shader);
+        obj.camera.bind(&obj.shader);
+        obj.texture.bind();
+        obj.model.bind();
+        obj.model.draw();
+    }
+}
+
+#[derive(Clone)]
+
+pub struct Object {
+    object_name: String,
+    class: ObjectClass,
+    dimension: ObjectType,
+    shader: shader::Shader,
+    camera: camera::Camera,
+    projection: projection::Projection,
+    model: model::Model,
+    texture: texture::Texture
 }
