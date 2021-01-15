@@ -36,10 +36,10 @@ impl<'b> Engine<'b> {
     }
 
     pub fn render_tick(&mut self) {
-        self.game_window.update();
         for i in self.objects.clone().unwrap() {
             self.graphic.clone().draw(i);
         }
+        self.game_window.update();
     }
 }
 

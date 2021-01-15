@@ -38,6 +38,7 @@ fn main() {
             gl::ClearColor(0.6, 0.3, 0.2, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
+        
         game_engine.render_tick();
     }
 }

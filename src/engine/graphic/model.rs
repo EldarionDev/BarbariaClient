@@ -1,6 +1,8 @@
-use std::{ffi::c_void, fs::File, io::{BufRead, BufReader}, mem::size_of, ptr};
+use std::{ffi::c_void, fs::File, io::{BufRead, BufReader}, mem::{self, size_of}, ptr};
 
 use crate::maths::Vec3;
+
+extern crate gl;
 
 
 enum ReadMode {
@@ -9,14 +11,14 @@ enum ReadMode {
 }
 
 struct ModelVertex {
-    x: f64,
-    y: f64,
-    z: f64,
-    normalX: f64,
-    normalY: f64,
-    normalZ: f64,
-    textureX: f64,
-    textureY: f64
+    x: f32,
+    y: f32,
+    z: f32,
+    normalX: f32,
+    normalY: f32,
+    normalZ: f32,
+    textureX: f32,
+    textureY: f32
 }
 
 #[derive(Clone)]
@@ -30,8 +32,8 @@ pub struct Model {
 impl Model {
     pub fn new(model_path: String) -> Model {
         /* Read Model file */
-        let mut vertices: Vec<ModelVertex> = Vec::with_capacity(50);
-        let mut indices: Vec<u32> = Vec::with_capacity(50);
+        let mut vertices: Vec<ModelVertex> = Vec::new();
+        let mut indices: Vec<u32> = Vec::new();
         let mut num_indices: u32 = 0;
         let mut num_vertices: u32 = 0;
 
@@ -43,20 +45,22 @@ impl Model {
             let line = line.unwrap();
             if line.contains("Vertices") {
                 mode = ReadMode::Vertices;
+                continue;
             } else if line.contains("Indices") {
                 mode = ReadMode::Indices; 
+                continue;   
             } else {
                 match mode {
                     ReadMode::Vertices => {
                         let mut split_string = line.split_whitespace();
-                        let x: f64 = split_string.next().unwrap().parse().unwrap();
-                        let y: f64 = split_string.next().unwrap().parse().unwrap();
-                        let z: f64 = split_string.next().unwrap().parse().unwrap();
-                        let normalX: f64 = split_string.next().unwrap().parse().unwrap();
-                        let normalY: f64 = split_string.next().unwrap().parse().unwrap();
-                        let normalZ: f64 = split_string.next().unwrap().parse().unwrap();
-                        let textureX: f64 = split_string.next().unwrap().parse().unwrap();
-                        let textureY: f64 = split_string.next().unwrap().parse().unwrap();
+                        let x: f32 = split_string.next().unwrap().parse().unwrap();
+                        let y: f32 = split_string.next().unwrap().parse().unwrap();
+                        let z: f32 = split_string.next().unwrap().parse().unwrap();
+                        let normalX: f32 = split_string.next().unwrap().parse().unwrap();
+                        let normalY: f32 = split_string.next().unwrap().parse().unwrap();
+                        let normalZ: f32 = split_string.next().unwrap().parse().unwrap();
+                        let textureX: f32 = split_string.next().unwrap().parse().unwrap();
+                        let textureY: f32 = split_string.next().unwrap().parse().unwrap();
                         vertices.push(ModelVertex {x, y, z, normalX, normalY, normalZ, textureX, textureY});
                         num_vertices += 1;
                     }
@@ -85,19 +89,21 @@ impl Model {
 
             /* Pass vertex data */
             /* Try vertices.as_ptr() */
-            gl::BufferData(gl::ARRAY_BUFFER, (num_vertices * 64) as isize, (&vertices).as_ptr() as *const c_void, gl::DYNAMIC_DRAW);
+            println!("test: {}", num_vertices * 64);
+            gl::BufferData(gl::ARRAY_BUFFER, (num_vertices * 8 * mem::size_of::<gl::types::GLfloat>() as u32) as gl::types::GLsizeiptr, vertices.as_ptr() as *const f32 as *const c_void, gl::DYNAMIC_DRAW);
 
+            let stride = 8 * mem::size_of::<gl::types::GLfloat>() as gl::types::GLsizei;
             /* Describe data */
-            gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 64, ptr::null());
+            gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, stride, ptr::null());
             gl::EnableVertexAttribArray(0);
-            gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 64, 24 as *mut c_void);
+            gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, stride, (3 * mem::size_of::<gl::types::GLfloat>()) as *const c_void);
             gl::EnableVertexAttribArray(1);
-            gl::VertexAttribPointer(2, 2, gl::FLOAT, gl::FALSE, 64, 48 as *mut c_void);
+            gl::VertexAttribPointer(2, 2, gl::FLOAT, gl::FALSE, stride, (6 * mem::size_of::<gl::types::GLfloat>()) as *const c_void);
             gl::EnableVertexAttribArray(2);
 
             /* Bind EBO and data to it */
             gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
-            gl::BufferData(gl::ELEMENT_ARRAY_BUFFER, (num_indices * 4) as isize, (&indices).as_ptr() as *const c_void, gl::DYNAMIC_DRAW);
+            gl::BufferData(gl::ELEMENT_ARRAY_BUFFER, (num_indices * mem::size_of::<gl::types::GLfloat>() as u32) as gl::types::GLsizeiptr, (&indices).as_ptr() as *const i32 as *const c_void, gl::DYNAMIC_DRAW);
         }
 
         /* Assign values and return */
