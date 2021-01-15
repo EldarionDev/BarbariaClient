@@ -21,7 +21,7 @@ impl<'b> Engine<'b> {
         //let object = graphic::Object::new(&mut graphic, "mines", graphic::ObjectType::Dimension2, graphic::ObjectClass::GUI);
         Engine {
             paths,
-            game_window: window::Window::new(),
+            game_window: window::Window::new(paths),
             graphic: graphic::Graphic::new(paths),
             objects: None
         }

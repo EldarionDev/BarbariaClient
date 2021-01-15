@@ -1,5 +1,7 @@
-use std::{fs, path::PathBuf};
+use std::{fs, path::{Path, PathBuf}};
 use std::io;
+
+use fs::ReadDir;
 
 /* Asset path contains all assets. Config path contains the game config while data path contains
 the object information. */
@@ -32,7 +34,7 @@ impl ResourceManager {
     /* Functions to return the asset paths */
     pub fn get_assets(&self, assets_name: &str) -> Vec<String> {
         let shader_path =  self.asset_path.to_string() + assets_name + "/";
-        return self.get_dir_files(&shader_path);
+        return self.return_files(&shader_path);
     }
 
     /* Functions to return data */
@@ -42,7 +44,7 @@ impl ResourceManager {
 
     pub fn get_data(&self, data_name: &str) -> Vec<String> {
         let unit_path = self.data_path.to_string() + data_name + "/";
-        return self.get_dir_files(&unit_path);
+        return self.return_files(&unit_path);
     }
 
     /* Functions to return world data */
@@ -52,20 +54,28 @@ impl ResourceManager {
             Some(i) => i
         }.to_string() + data_name + "/";
 
-        return self.get_dir_files(&world_data_path);
+        return self.return_files(&world_data_path);
     }
 
-    fn get_dir_files<'b>(&self, path: &str) -> Vec<String>{
-        
-        let files = match fs::read_dir(path) {
+    fn return_files<'b>(&self, path: &str) -> Vec<String> {
+        let mut files = match fs::read_dir(path) {
             Err(_) => panic!("Directory: {} could not be opened!", path),
             Ok(i) => i
         };
+        let mut file_names: Vec<String> = Vec::new();
+        self.get_files(&mut files, &mut file_names);
+        return file_names;
+    }
 
-        let mut file_names: Vec<String> = vec![];
-
-        for file in files {
-            file_names.push(file.unwrap().path().to_str().unwrap().to_string());
+    fn get_files<'b>(&self, dir: &mut ReadDir, file_names: &mut Vec<String>){
+    
+        for file in dir {
+            let path = file.unwrap().path();
+            if path.is_dir() {
+                self.get_files(&mut fs::read_dir(path).unwrap(), file_names);
+                continue;
+            }
+            file_names.push(path.to_str().unwrap().to_string());
         }
 
         /*let mut return_value: Vec<String> = vec![];
@@ -73,7 +83,5 @@ impl ResourceManager {
             let full_path = path.to_string() + &file_name;
             return_value.push(full_path);
         } */
-
-        return file_names;
     }
 }

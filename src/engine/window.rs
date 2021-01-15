@@ -1,19 +1,20 @@
-use glfw::Context;
+use glfw::{Context};
+
+use crate::Config;
 
 pub struct Window {
     window: glfw::Window
 }
 
 impl Window {
-    pub fn new() -> Window{
+    pub fn new(paths: &Config) -> Window{
         let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
         glfw.window_hint(glfw::WindowHint::ContextVersion(4, 4));
         glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
         #[cfg(target_os = "macos")]
         glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
-        let (mut window, events) = glfw.create_window(1920, 1080, "Third Age Reforged", glfw::WindowMode::Windowed)
-            .expect("Failed to create game window!");
+        let (mut window, events) = glfw.create_window(1920, 1070, "Third Age Reforged", glfw::WindowMode::Windowed).expect("Could notcreate window.");
 
         window.set_key_polling(true);
         window.set_framebuffer_size_polling(true);

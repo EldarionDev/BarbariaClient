@@ -25,7 +25,7 @@ impl Texture {
 
         /* Attach image to OpenGL texture */
         unsafe {
-            gl::TexImage2D(gl::TEXTURE_2D, 0, gl::RGB as i32, image.width() as i32, image.height() as i32, 0, gl::RGBA, gl::UNSIGNED_BYTE, &image_data[0] as *const u8 as *const c_void);
+            gl::TexImage2D(gl::TEXTURE_2D, 0, gl::RGB as i32, image.width() as i32, image.height() as i32, 0, gl::RGB, gl::UNSIGNED_BYTE, &image_data[0] as *const u8 as *const c_void);
             gl::GenerateMipmap(gl::TEXTURE_2D);
         }
 
