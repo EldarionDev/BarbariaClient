@@ -45,6 +45,8 @@ impl Graphic {
         for (i, x) in paths.resource_manager.get_assets("animations").iter().enumerate() {
             let mut splitted_string = x.split('/');
             let mut splitted_string = splitted_string.last().unwrap();
+            let mut splitted_string = splitted_string.split('.');
+            let splitted_string = splitted_string.next().unwrap();
             animations.insert(splitted_string.to_string(), animation::Animation::new(x));
         }
 
@@ -76,9 +78,9 @@ impl Graphic {
         }
 
         for (i, x) in paths.resource_manager.get_assets("textures").iter().enumerate() {
-            let mut splitted_string = x.split('/');
-            let mut splitted_string = splitted_string.last().unwrap();
-            textures.insert(splitted_string.to_string(), texture::Texture::new(x.to_string()));
+            /*let mut splitted_string = x.split('/');
+            let mut splitted_string = splitted_string.last().unwrap(); */
+            textures.insert(x.to_string(), texture::Texture::new(x.to_string()));
         }
 
         Graphic {

@@ -1,6 +1,4 @@
-use std::{fs, path::{Path, PathBuf}};
-use std::io;
-
+use std::fs;
 use fs::ReadDir;
 
 /* Asset path contains all assets. Config path contains the game config while data path contains
@@ -28,7 +26,11 @@ impl ResourceManager {
     }
 
     pub fn get_world(&self) -> String{
-        return self.world_path.to_owned().unwrap().clone();
+        let world_path = match self.world_path.to_owned() {
+            Some(i) => i,
+            None => panic!("World path could not be converted to string.")
+        };
+        return world_path.clone();
     }
 
     /* Functions to return the asset paths */
@@ -57,6 +59,12 @@ impl ResourceManager {
         return self.return_files(&world_data_path);
     }
 
+    /* Function to return a config file */
+    pub fn get_config(&self, config_name: &str) -> String{
+        let path = self.config_path.clone() + config_name;
+        return path;
+    }
+
     fn return_files<'b>(&self, path: &str) -> Vec<String> {
         let mut files = match fs::read_dir(path) {
             Err(_) => panic!("Directory: {} could not be opened!", path),
@@ -70,18 +78,26 @@ impl ResourceManager {
     fn get_files<'b>(&self, dir: &mut ReadDir, file_names: &mut Vec<String>){
     
         for file in dir {
-            let path = file.unwrap().path();
+            let path = match file {
+                Ok(f) => f,
+                Err(e) => panic!("Could not get files of with error: {}", e)
+            }.path();
+            
             if path.is_dir() {
-                self.get_files(&mut fs::read_dir(path).unwrap(), file_names);
+                let mut recursive_path = match fs::read_dir(path){
+                    Ok(r) => r,
+                    Err(e) => panic!("Directory: {} could not be opened!", e)
+                };
+                self.get_files(&mut recursive_path, file_names);
                 continue;
             }
-            file_names.push(path.to_str().unwrap().to_string());
-        }
 
-        /*let mut return_value: Vec<String> = vec![];
-        for file_name in file_names {
-            let full_path = path.to_string() + &file_name;
-            return_value.push(full_path);
-        } */
+            let final_path = match path.to_str() {
+                Some(s) => s,
+                None => panic!("Could not convert path to string")
+            }.to_string();
+
+            file_names.push(final_path);
+        }
     }
 }

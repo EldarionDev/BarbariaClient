@@ -1,5 +1,3 @@
-use std::{clone, env};
-
 mod resource_manager;
 mod game;
 mod engine;
@@ -10,9 +8,9 @@ pub struct Config {
 }
 
 fn main() {
-    let cmd_args: Vec<String> = env::args().collect();
-
-    /* In final executable 
+    
+    /* In final executable
+    let cmd_args: Vec<String> = env::args().collect(); 
     let asset_path: &str = &cmd_args[1];
     let config_path: &str = &cmd_args[2];
     let data_path: &str = &cmd_args[3]; */

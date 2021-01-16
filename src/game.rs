@@ -25,9 +25,18 @@ impl<'a> Game<'a> {
 
     pub fn load_world(&self) {
         for faction_file in self.paths.resource_manager.get_world_data("factions") {
-            let faction_file_content: String = fs::read_to_string(faction_file).unwrap().parse().unwrap();
+            //let faction_file_content: String = fs::read_to_string(faction_file).unwrap().parse().unwrap();
+            let faction_file_content = match fs::read_to_string(faction_file) {
+                Ok(f) => f,
+                Err(e) => panic!("Could not open faction file because of: {}", e)
+            };
+
             let faction_file_content: &str = &faction_file_content[..];
-            let faction: faction::Faction = serde_json::from_str(faction_file_content).unwrap();
+
+            let _: faction::Faction = match serde_json::from_str(faction_file_content) {
+                Ok(f) => f,
+                Err(e) => panic!("Could not create faction from JSON: {}", e)
+            };
         }
     }
 
@@ -35,6 +44,20 @@ impl<'a> Game<'a> {
         let file = File::create(self.paths.resource_manager.get_world().to_owned() + "test_faction.json");
         let f = faction::Faction::new("Hello there".to_string());
         let json_data = serde_json::to_string(&f);
-        file.unwrap().write_all(json_data.unwrap().as_bytes());
+
+        let mut save_file = match file {
+            Ok(f) => f,
+            Err(e) => panic!("Could not create save file while saving world: {}", e)
+        };
+
+        let save_data = match json_data {
+            Ok(s) => s,
+            Err(e) => panic!("Could not proceed JSON data while saving world: {}", e)
+        };
+
+        match save_file.write_all(save_data.as_bytes()) {
+            Ok(_) => (),
+            Err(e) => panic!("Error while saving world: {}", e)
+        }
     }
 }

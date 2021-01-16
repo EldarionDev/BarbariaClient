@@ -1,6 +1,4 @@
-use std::{ffi::c_void, fs::File, io::{BufRead, BufReader}, mem::{self, size_of}, ptr};
-
-use crate::maths::Vec3;
+use std::{ffi::c_void, fs::File, io::{BufRead, BufReader}, mem, ptr};
 
 extern crate gl;
 
