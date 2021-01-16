@@ -1,4 +1,4 @@
-use std::{ffi::c_void, fs::File, io::{BufRead, BufReader}, mem, ptr};
+use std::{ffi::c_void, fs::File, io::{BufRead, BufReader}, mem, ptr, str::SplitWhitespace};
 
 extern crate gl;
 
@@ -12,11 +12,11 @@ struct ModelVertex {
     x: f32,
     y: f32,
     z: f32,
-    normalX: f32,
-    normalY: f32,
-    normalZ: f32,
-    textureX: f32,
-    textureY: f32
+    normal_x: f32,
+    normal_y: f32,
+    normal_z: f32,
+    texture_x: f32,
+    texture_y: f32
 }
 
 #[derive(Clone)]
@@ -35,12 +35,30 @@ impl Model {
         let mut num_indices: u32 = 0;
         let mut num_vertices: u32 = 0;
 
-        let model_file = File::open(model_path).unwrap();
+        let model_file = match File::open(model_path) {
+            Ok(f) => f,
+            Err(e) => panic!("Could not read model file: {}", e)
+        };
         let reader = BufReader::new(model_file);
         let mut mode = ReadMode::Vertices;
 
-        for (index, line) in reader.lines().enumerate() {
-            let line = line.unwrap();
+        let split_convert_string = |s: &mut SplitWhitespace<'_>| -> f32 {
+            let s = match s.next() {
+                Some(s) => s,
+                None => panic!("Could not split by Whitespaces in model file")
+            };
+            match s.parse() {
+                Ok(f) => f,
+                Err(e) => panic!("Could not convert model file string to float: {}", e)
+            }
+        };
+
+        for (_, line) in reader.lines().enumerate() {
+            let line = match line {
+                Ok(l) => l,
+                Err(e) => panic!("Could not read line of model file: {}", e)
+            };
+
             if line.contains("Vertices") {
                 mode = ReadMode::Vertices;
                 continue;
@@ -51,19 +69,34 @@ impl Model {
                 match mode {
                     ReadMode::Vertices => {
                         let mut split_string = line.split_whitespace();
-                        let x: f32 = split_string.next().unwrap().parse().unwrap();
-                        let y: f32 = split_string.next().unwrap().parse().unwrap();
-                        let z: f32 = split_string.next().unwrap().parse().unwrap();
-                        let normalX: f32 = split_string.next().unwrap().parse().unwrap();
-                        let normalY: f32 = split_string.next().unwrap().parse().unwrap();
-                        let normalZ: f32 = split_string.next().unwrap().parse().unwrap();
-                        let textureX: f32 = split_string.next().unwrap().parse().unwrap();
-                        let textureY: f32 = split_string.next().unwrap().parse().unwrap();
-                        vertices.push(ModelVertex {x, y, z, normalX, normalY, normalZ, textureX, textureY});
+                        let x: f32 = split_convert_string(&mut split_string);
+                        let y: f32 = split_convert_string(&mut split_string);
+                        let z: f32 = split_convert_string(&mut split_string);
+                        let normal_x: f32 = split_convert_string(&mut split_string);
+                        let normal_y: f32 = split_convert_string(&mut split_string);
+                        let normal_z: f32 = split_convert_string(&mut split_string);
+                        let texture_x: f32 = split_convert_string(&mut split_string);
+                        let texture_y: f32 = split_convert_string(&mut split_string);
+                        vertices.push(ModelVertex {x, y, z, normal_x, normal_y, normal_z, texture_x, texture_y});
                         num_vertices += 1;
                     }
                     ReadMode::Indices => {
-                        indices.push(line.split_whitespace().next().unwrap().lines().next().unwrap().parse().unwrap());
+                        let index = match line.split_whitespace().next() {
+                            Some(i) => i,
+                            None => panic!("Error extracting whitespaces from index of model file!")
+                        };
+
+                        let index = match index.lines().next() {
+                            Some(i) => i,
+                            None => panic!("Error extracting newlines from index of model file!")
+                        };
+
+                        let index: u32 = match index.parse() {
+                            Ok(i) => i,
+                            Err(e) => panic!("Failed converting index of model file to u32 type: {}", e)
+                        };
+
+                        indices.push(index);
                         num_indices += 1;
                     }
                 }

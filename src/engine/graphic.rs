@@ -44,7 +44,10 @@ impl Graphic {
 
         let split_string = |s: &str, split: char| -> String {
             let s = s.split(split);
-            s.last().unwrap().to_string()
+            match s.last() {
+                Some(s) => s,
+                None => panic!("Could not split string!")
+            }.to_string()
         };
 
         for (_, x) in paths.resource_manager.get_assets("animations").iter().enumerate() {
@@ -66,7 +69,11 @@ impl Graphic {
         for (_, x) in paths.resource_manager.get_assets("shaders").iter().enumerate() {
             let string = split_string(&split_string(x, '/')[..], '.');
             if shaders.contains_key(&string[..]) {continue};
-            shaders.insert(string, shader::Shader::new(x.split('.').next().unwrap().to_string()));
+            let shader_path = match x.split('.').next() {
+                Some(s) => s,
+                None => panic!("Error spliting shader string!")
+            };
+            shaders.insert(string, shader::Shader::new(shader_path.to_string()));
         }
 
         for (_, x) in paths.resource_manager.get_assets("textures").iter().enumerate() {
