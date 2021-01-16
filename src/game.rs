@@ -25,7 +25,6 @@ impl<'a> Game<'a> {
 
     pub fn load_world(&self) {
         for faction_file in self.paths.resource_manager.get_world_data("factions") {
-            //let faction_file_content: String = fs::read_to_string(faction_file).unwrap().parse().unwrap();
             let faction_file_content = match fs::read_to_string(faction_file) {
                 Ok(f) => f,
                 Err(e) => panic!("Could not open faction file because of: {}", e)

@@ -42,44 +42,34 @@ impl Graphic {
         let mut shaders: HashMap<String, shader::Shader> = HashMap::new();
         let mut textures: HashMap<String, texture::Texture> = HashMap::new();
 
-        for (i, x) in paths.resource_manager.get_assets("animations").iter().enumerate() {
-            let mut splitted_string = x.split('/');
-            let mut splitted_string = splitted_string.last().unwrap();
-            let mut splitted_string = splitted_string.split('.');
-            let splitted_string = splitted_string.next().unwrap();
-            animations.insert(splitted_string.to_string(), animation::Animation::new(x));
+        let split_string = |s: &str, split: char| -> String {
+            let s = s.split(split);
+            s.last().unwrap().to_string()
+        };
+
+        for (_, x) in paths.resource_manager.get_assets("animations").iter().enumerate() {
+            animations.insert(split_string(&split_string(x, '/')[..], '.'), animation::Animation::new(x));
         }
 
-        for (i, x) in paths.resource_manager.get_assets("cameras").iter().enumerate() {
-            let mut splitted_string = x.split('/');
-            let mut splitted_string = splitted_string.last().unwrap();
-            cameras.insert(splitted_string.to_string(), camera::Camera::new(x));
+        for (_, x) in paths.resource_manager.get_assets("cameras").iter().enumerate() {
+            cameras.insert(split_string(x, '/'), camera::Camera::new(x));
         }
 
-        for (i, x) in paths.resource_manager.get_assets("models").iter().enumerate() {
-            let mut splitted_string = x.split('/');
-            let mut splitted_string = splitted_string.last().unwrap();
-            models.insert(splitted_string.to_string(), model::Model::new(x.to_string()));
+        for (_, x) in paths.resource_manager.get_assets("models").iter().enumerate() {
+            models.insert(split_string(x, '/'), model::Model::new(x.to_string()));
         }
 
-        for (i, x) in paths.resource_manager.get_assets("projections").iter().enumerate() {
-            let mut splitted_string = x.split('/');
-            let mut splitted_string = splitted_string.last().unwrap();
-            projections.insert(splitted_string.to_string(), projection::Projection::new(x));
+        for (_, x) in paths.resource_manager.get_assets("projections").iter().enumerate() {
+            projections.insert(split_string(x, '/'), projection::Projection::new(x));
         }
 
-        for (i, x) in paths.resource_manager.get_assets("shaders").iter().enumerate() {
-            let mut splitted_string = x.split('/');
-            let mut splitted_string = splitted_string.last().unwrap();
-            let mut splitted_string = splitted_string.split('.');
-            let splitted_string = splitted_string.next().unwrap();
-            if shaders.contains_key(splitted_string) {continue};
-            shaders.insert(splitted_string.to_string(), shader::Shader::new(x.split('.').next().unwrap().to_string()));
+        for (_, x) in paths.resource_manager.get_assets("shaders").iter().enumerate() {
+            let string = split_string(&split_string(x, '/')[..], '.');
+            if shaders.contains_key(&string[..]) {continue};
+            shaders.insert(string, shader::Shader::new(x.split('.').next().unwrap().to_string()));
         }
 
-        for (i, x) in paths.resource_manager.get_assets("textures").iter().enumerate() {
-            /*let mut splitted_string = x.split('/');
-            let mut splitted_string = splitted_string.last().unwrap(); */
+        for (_, x) in paths.resource_manager.get_assets("textures").iter().enumerate() {
             textures.insert(x.to_string(), texture::Texture::new(x.to_string()));
         }
 
@@ -98,7 +88,7 @@ impl Graphic {
         let mut projection_name: String = String::new();
         let mut camera_name: String = String::new();
         let mut model_name = name.to_string() + ".pmf";
-        let mut texture_name = name.to_string() + ".tga";
+        let texture_name = name.to_string() + ".tga";
 
         match dimension {
             ObjectType::Dimension2 => {
@@ -159,7 +149,7 @@ impl Graphic {
         }
     }
 
-    pub fn draw(mut self, obj: Object) {
+    pub fn draw(self, obj: Object) {
         obj.shader.bind();
         obj.projection.bind(&obj.shader);
         obj.camera.bind(&obj.shader);
