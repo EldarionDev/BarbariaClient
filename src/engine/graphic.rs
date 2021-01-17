@@ -1,4 +1,4 @@
-use crate::{Config, maths::Vec3};
+use crate::{Config, game::Game, maths::Vec3};
 use std::collections::HashMap;
 
 mod animation;
@@ -15,6 +15,7 @@ pub enum ObjectClass {
     Lake,
     Terrain,
     GUI,
+    Building
 }
 
 #[derive(Clone)]
@@ -133,7 +134,7 @@ impl Graphic {
         }
     }
 
-    pub fn create_object(&self, name: &str, dimension: ObjectType, class: ObjectClass) -> Object {
+    pub fn create_object(&self, name: &str, dimension: &ObjectType, class: &ObjectClass) -> Object {
         let mut shader_name: String = String::new();
         let mut projection_name: String = String::new();
         let mut camera_name: String = String::new();
@@ -160,6 +161,7 @@ impl Graphic {
             ObjectClass::Settlement => shader_name += "_settlement",
             ObjectClass::Terrain => shader_name += "_terrain",
             ObjectClass::GUI => shader_name += "_gui",
+            ObjectClass::Building => shader_name += "_building"
         }
 
         let shader_ref: shader::Shader = match self.shaders.get(&shader_name) {
@@ -198,30 +200,37 @@ impl Graphic {
 
         Object {
             object_name: name.to_string(),
-            class,
-            dimension,
+            class: class.clone(),
+            dimension: dimension.clone(),
             shader: shader_ref,
             camera: camera::Camera::new("bef"),
             projection: projection::Projection::new("test"),
             model: model_ref,
             texture: texture_ref,
+            game_objects: None
         }
     }
 
     pub fn draw(&self, obj: &Object) {
+        let game_objects = match &obj.game_objects {
+            Some(i) => i,
+            None => return
+        };
+
         obj.shader.bind();
         obj.projection.bind(&obj.shader);
         obj.camera.bind(&obj.shader);
         obj.texture.bind();
-        obj.model.bind();
-        obj.model.draw();
+        
+        for i in game_objects.iter() {
+            obj.model.bind(&i.position);
+            obj.model.draw();
+        }
     }
 }
 
-#[derive(Clone)]
-
 pub struct Object {
-    object_name: String,
+    pub object_name: String,
     class: ObjectClass,
     dimension: ObjectType,
     shader: shader::Shader,
@@ -229,4 +238,50 @@ pub struct Object {
     projection: projection::Projection,
     model: model::Model,
     texture: texture::Texture,
+    game_objects: Option<Vec<ObjectInstance>>
+}
+
+impl Object {
+    pub fn add(&mut self, position: Vec3) {
+        match &mut self.game_objects {
+            Some(i) => {
+                i.push(ObjectInstance {
+                    position
+                });
+            }
+            None => {
+                self.game_objects = Some(vec![ObjectInstance {
+                    position
+                }]);
+            }
+        }
+    }
+
+    pub fn remove(&mut self, position: Vec3) {
+        let vec = match &mut self.game_objects {
+            Some(i) => i,
+            None => panic!("No object instance exists to remove!")
+        };
+
+        let mut index = 0;
+        let mut found = false;
+        for g in vec.iter() {
+            if g.position == position {
+                found = true;
+                break;
+            } else {
+                index += 1;
+            }
+        }
+
+        if found {
+            vec.remove(index);
+        } else {
+            panic!("Could not find object instance to remove!");
+        }
+    }
+}
+
+pub struct ObjectInstance {
+    position: Vec3
 }

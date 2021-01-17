@@ -6,6 +6,8 @@ use std::{
     str::SplitWhitespace,
 };
 
+use crate::maths::Vec3;
+
 extern crate gl;
 
 enum ReadMode {
@@ -190,7 +192,7 @@ impl Model {
         }
     }
 
-    pub fn bind(&self) {
+    pub fn bind(&self, position: &Vec3) {
         unsafe {
             gl::BindVertexArray(self.vertex_array_object);
         }
