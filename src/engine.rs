@@ -1,12 +1,14 @@
 use std::fs;
 
+use crate::{game::Game, maths::Vec3};
+
 use super::Config;
 use rand::Rng;
 use serde_json::Value;
 
+mod events;
 mod graphic;
 mod physics;
-mod events;
 mod window;
 
 pub struct Engine<'b> {
@@ -27,31 +29,53 @@ impl<'b> Engine<'b> {
 
         Engine {
             paths,
-            game_window: window::Window::new(json_content["screenWidth"].as_u64().unwrap() as u32, json_content["screenHeight"].as_u64().unwrap() as u32),
+            game_window: window::Window::new(
+                json_content["screenWidth"].as_u64().unwrap() as u32,
+                json_content["screenHeight"].as_u64().unwrap() as u32,
+            ),
             graphic: graphic::Graphic::new(paths),
-            objects: None
+            objects: None,
+        }
+    }
+
+    pub fn register_object(&mut self, obj: graphic::Object) {
+        let object_reference = &mut self.objects;
+        match object_reference {
+            Some(i) => i.push(obj),
+            None => self.objects = Some(vec![obj])
         }
     }
 
     pub fn open_title_screen(&mut self) {
         let title_screen_files = self.paths.resource_manager.get_assets("textures");
         let title_screen_count = title_screen_files.len();
-        let random_title_screen = rand::thread_rng().gen_range(0..(title_screen_count-1));
+        let random_title_screen = rand::thread_rng().gen_range(0..(title_screen_count - 1));
         let random_title_screen = &title_screen_files[random_title_screen];
         let random_title_screen = random_title_screen.split('.').next().unwrap();
-        self.objects = Some(vec![self.graphic.create_object(random_title_screen, graphic::ObjectType::Dimension2, graphic::ObjectClass::GUI)]);
+        self.register_object(self.graphic.create_object(random_title_screen, graphic::ObjectType::Dimension2, graphic::ObjectClass::GUI))
     }
 
     pub fn render_tick(&mut self) {
-        for i in self.objects.clone().unwrap() {
-            self.graphic.clone().draw(i);
+        let object_reference = &mut self.objects;
+        let object_reference = match object_reference {
+            Some(i) => i,
+            None => {
+                println!("Issued draw call though no objects exist.");
+                return;
+            }
+        };
+
+        let graphic_reference = &mut self.graphic;
+
+        for i in object_reference.iter() {
+            graphic_reference.draw(i);
         }
-        self.game_window.update();
+
+        let window_reference = &mut self.game_window;
+        window_reference.update();
     }
 }
 
 impl<'a> Drop for Engine<'a> {
-    fn drop(&mut self) {
-        
-    }
+    fn drop(&mut self) {}
 }

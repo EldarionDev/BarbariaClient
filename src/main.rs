@@ -1,16 +1,15 @@
-mod resource_manager;
-mod game;
 mod engine;
+mod game;
 mod maths;
+mod resource_manager;
 
 pub struct Config {
     resource_manager: resource_manager::ResourceManager,
 }
 
 fn main() {
-    
     /* In final executable
-    let cmd_args: Vec<String> = env::args().collect(); 
+    let cmd_args: Vec<String> = env::args().collect();
     let asset_path: &str = &cmd_args[1];
     let config_path: &str = &cmd_args[2];
     let data_path: &str = &cmd_args[3]; */
@@ -21,7 +20,11 @@ fn main() {
     let data_path: &str = "data/";
 
     let mut program_config = Config {
-        resource_manager: resource_manager::ResourceManager::new(asset_path, config_path, data_path)
+        resource_manager: resource_manager::ResourceManager::new(
+            asset_path,
+            config_path,
+            data_path,
+        ),
     };
     program_config.resource_manager.set_world("world/");
 
@@ -36,7 +39,7 @@ fn main() {
             gl::ClearColor(0.6, 0.3, 0.2, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
-        
+
         game_engine.render_tick();
     }
 }

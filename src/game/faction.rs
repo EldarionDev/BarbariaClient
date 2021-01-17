@@ -7,11 +7,11 @@ mod settlement;
 pub struct Faction {
     name: String,
     armies: Option<Vec<army::Army>>,
-    settlements: Option<Vec<settlement::Settlement>>
+    settlements: Option<Vec<settlement::Settlement>>,
 }
 
 impl Faction {
-    pub fn new(name: String)-> Self {
+    pub fn new(name: String) -> Self {
         Faction {
             name,
             armies: None,

@@ -1,14 +1,10 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct Building {
-
-}
+pub struct Building {}
 
 impl Building {
     pub fn new() -> Self {
-        Building {
-            
-        }
+        Building {}
     }
 }

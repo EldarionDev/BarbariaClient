@@ -2,7 +2,7 @@ use std::{ffi::CString, fs, ptr};
 
 #[derive(Clone)]
 pub struct Shader {
-    shader_program: u32
+    shader_program: u32,
 }
 
 impl Shader {
@@ -13,37 +13,55 @@ impl Shader {
 
         let vertex_shader_content = match fs::read_to_string(vertex_shader_path) {
             Ok(c) => c,
-            Err(e) => panic!("Error while reading vertex shader of: {} because: {}", shader_base_path, e)
+            Err(e) => panic!(
+                "Error while reading vertex shader of: {} because: {}",
+                shader_base_path, e
+            ),
         };
 
         let fragment_shader_content = match fs::read_to_string(fragment_shader_path) {
             Ok(c) => c,
-            Err(e) => panic!("Error while reading fragment shader of: {} because: {}", shader_base_path, e)
+            Err(e) => panic!(
+                "Error while reading fragment shader of: {} because: {}",
+                shader_base_path, e
+            ),
         };
 
         let vertex_shader_content = match CString::new(vertex_shader_content.as_bytes()) {
             Ok(c) => c,
-            Err(e) => panic!("Error while converting vertex shader of: {} to a CString because: {}", shader_base_path, e)
+            Err(e) => panic!(
+                "Error while converting vertex shader of: {} to a CString because: {}",
+                shader_base_path, e
+            ),
         };
-        
+
         let fragment_shader_content = match CString::new(fragment_shader_content.as_bytes()) {
             Ok(c) => c,
-            Err(e) => panic!("Error while converting fragment shader of: {} to a CString because: {}", shader_base_path, e)
+            Err(e) => panic!(
+                "Error while converting fragment shader of: {} to a CString because: {}",
+                shader_base_path, e
+            ),
         };
 
         /* Create OpenGL shaders */
-        let vertex_shader: u32 = unsafe {
-            gl::CreateShader(gl::VERTEX_SHADER)
-        };
+        let vertex_shader: u32 = unsafe { gl::CreateShader(gl::VERTEX_SHADER) };
 
-        let fragment_shader: u32 = unsafe {
-            gl::CreateShader(gl::FRAGMENT_SHADER)
-        };
+        let fragment_shader: u32 = unsafe { gl::CreateShader(gl::FRAGMENT_SHADER) };
 
         /* Assign shader source codes to OpenGL shaders */
         unsafe {
-            gl::ShaderSource(vertex_shader, 1, &vertex_shader_content.as_ptr(), ptr::null());
-            gl::ShaderSource(fragment_shader, 1, &fragment_shader_content.as_ptr(), ptr::null());
+            gl::ShaderSource(
+                vertex_shader,
+                1,
+                &vertex_shader_content.as_ptr(),
+                ptr::null(),
+            );
+            gl::ShaderSource(
+                fragment_shader,
+                1,
+                &fragment_shader_content.as_ptr(),
+                ptr::null(),
+            );
         }
 
         /* Compile the shaders and check for errors */
@@ -54,16 +72,26 @@ impl Shader {
         unsafe {
             gl::CompileShader(vertex_shader);
             gl::CompileShader(fragment_shader);
-            
+
             gl::GetShaderiv(vertex_shader, gl::COMPILE_STATUS, success_ptr);
             if success < 1 {
-                gl::GetShaderInfoLog(vertex_shader, 512, 0 as *mut i32, info_log.as_ptr() as *mut i8);
+                gl::GetShaderInfoLog(
+                    vertex_shader,
+                    512,
+                    0 as *mut i32,
+                    info_log.as_ptr() as *mut i8,
+                );
                 println!("Fatal error compiling vertex shader: {:?}", info_log);
             }
 
             gl::GetShaderiv(fragment_shader, gl::COMPILE_STATUS, success_ptr);
             if success < 1 {
-                gl::GetShaderInfoLog(fragment_shader, 512, 0 as *mut i32, info_log.as_ptr() as *mut i8);
+                gl::GetShaderInfoLog(
+                    fragment_shader,
+                    512,
+                    0 as *mut i32,
+                    info_log.as_ptr() as *mut i8,
+                );
                 println!("Fatal error compiling fragment shader: {:?}", info_log);
             }
         }
@@ -83,15 +111,18 @@ impl Shader {
             /* Check for errors */
             gl::GetProgramiv(shader_program, gl::LINK_STATUS, success_ptr);
             if success < 1 {
-                gl::GetProgramInfoLog(shader_program, 512, 0 as *mut i32, info_log.as_ptr() as *mut i8);
+                gl::GetProgramInfoLog(
+                    shader_program,
+                    512,
+                    0 as *mut i32,
+                    info_log.as_ptr() as *mut i8,
+                );
                 println!("Error while linking shader program: {:?}", info_log);
             }
         }
 
         /* Assign values and return */
-        Shader {
-            shader_program
-        }
+        Shader { shader_program }
     }
 
     pub fn bind(&self) {

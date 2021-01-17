@@ -1,9 +1,9 @@
-use std::{ffi::c_void, path::Path};
 use image::GenericImage;
+use std::{ffi::c_void, path::Path};
 
 #[derive(Clone)]
 pub struct Texture {
-    texture_id: u32
+    texture_id: u32,
 }
 
 impl Texture {
@@ -25,13 +25,23 @@ impl Texture {
 
         /* Attach image to OpenGL texture */
         unsafe {
-            gl::TexImage2D(gl::TEXTURE_2D, 0, gl::RGB as i32, image.width() as i32, image.height() as i32, 0, gl::RGB, gl::UNSIGNED_BYTE, &image_data[0] as *const u8 as *const c_void);
+            gl::TexImage2D(
+                gl::TEXTURE_2D,
+                0,
+                gl::RGB as i32,
+                image.width() as i32,
+                image.height() as i32,
+                0,
+                gl::RGB,
+                gl::UNSIGNED_BYTE,
+                &image_data[0] as *const u8 as *const c_void,
+            );
             gl::GenerateMipmap(gl::TEXTURE_2D);
         }
 
         /* Assign values and return */
         Texture {
-            texture_id: opengl_texture
+            texture_id: opengl_texture,
         }
     }
 
@@ -39,6 +49,6 @@ impl Texture {
         unsafe {
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, self.texture_id);
-        }   
+        }
     }
 }

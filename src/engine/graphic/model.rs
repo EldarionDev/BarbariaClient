@@ -1,11 +1,16 @@
-use std::{ffi::c_void, fs::File, io::{BufRead, BufReader}, mem, ptr, str::SplitWhitespace};
+use std::{
+    ffi::c_void,
+    fs::File,
+    io::{BufRead, BufReader},
+    mem, ptr,
+    str::SplitWhitespace,
+};
 
 extern crate gl;
 
-
 enum ReadMode {
     Vertices,
-    Indices
+    Indices,
 }
 
 struct ModelVertex {
@@ -16,7 +21,7 @@ struct ModelVertex {
     normal_y: f32,
     normal_z: f32,
     texture_x: f32,
-    texture_y: f32
+    texture_y: f32,
 }
 
 #[derive(Clone)]
@@ -24,7 +29,7 @@ pub struct Model {
     vertex_array_object: u32,
     vertex_buffer_object: u32,
     element_buffer_object: u32,
-    num_indices: u32
+    num_indices: u32,
 }
 
 impl Model {
@@ -37,7 +42,7 @@ impl Model {
 
         let model_file = match File::open(model_path) {
             Ok(f) => f,
-            Err(e) => panic!("Could not read model file: {}", e)
+            Err(e) => panic!("Could not read model file: {}", e),
         };
         let reader = BufReader::new(model_file);
         let mut mode = ReadMode::Vertices;
@@ -45,26 +50,26 @@ impl Model {
         let split_convert_string = |s: &mut SplitWhitespace<'_>| -> f32 {
             let s = match s.next() {
                 Some(s) => s,
-                None => panic!("Could not split by Whitespaces in model file")
+                None => panic!("Could not split by Whitespaces in model file"),
             };
             match s.parse() {
                 Ok(f) => f,
-                Err(e) => panic!("Could not convert model file string to float: {}", e)
+                Err(e) => panic!("Could not convert model file string to float: {}", e),
             }
         };
 
         for (_, line) in reader.lines().enumerate() {
             let line = match line {
                 Ok(l) => l,
-                Err(e) => panic!("Could not read line of model file: {}", e)
+                Err(e) => panic!("Could not read line of model file: {}", e),
             };
 
             if line.contains("Vertices") {
                 mode = ReadMode::Vertices;
                 continue;
             } else if line.contains("Indices") {
-                mode = ReadMode::Indices; 
-                continue;   
+                mode = ReadMode::Indices;
+                continue;
             } else {
                 match mode {
                     ReadMode::Vertices => {
@@ -77,23 +82,36 @@ impl Model {
                         let normal_z: f32 = split_convert_string(&mut split_string);
                         let texture_x: f32 = split_convert_string(&mut split_string);
                         let texture_y: f32 = split_convert_string(&mut split_string);
-                        vertices.push(ModelVertex {x, y, z, normal_x, normal_y, normal_z, texture_x, texture_y});
+                        vertices.push(ModelVertex {
+                            x,
+                            y,
+                            z,
+                            normal_x,
+                            normal_y,
+                            normal_z,
+                            texture_x,
+                            texture_y,
+                        });
                         num_vertices += 1;
                     }
                     ReadMode::Indices => {
                         let index = match line.split_whitespace().next() {
                             Some(i) => i,
-                            None => panic!("Error extracting whitespaces from index of model file!")
+                            None => {
+                                panic!("Error extracting whitespaces from index of model file!")
+                            }
                         };
 
                         let index = match index.lines().next() {
                             Some(i) => i,
-                            None => panic!("Error extracting newlines from index of model file!")
+                            None => panic!("Error extracting newlines from index of model file!"),
                         };
 
                         let index: u32 = match index.parse() {
                             Ok(i) => i,
-                            Err(e) => panic!("Failed converting index of model file to u32 type: {}", e)
+                            Err(e) => {
+                                panic!("Failed converting index of model file to u32 type: {}", e)
+                            }
                         };
 
                         indices.push(index);
@@ -121,20 +139,46 @@ impl Model {
             /* Pass vertex data */
             /* Try vertices.as_ptr() */
             println!("test: {}", num_vertices * 64);
-            gl::BufferData(gl::ARRAY_BUFFER, (num_vertices * 8 * mem::size_of::<gl::types::GLfloat>() as u32) as gl::types::GLsizeiptr, vertices.as_ptr() as *const f32 as *const c_void, gl::DYNAMIC_DRAW);
+            gl::BufferData(
+                gl::ARRAY_BUFFER,
+                (num_vertices * 8 * mem::size_of::<gl::types::GLfloat>() as u32)
+                    as gl::types::GLsizeiptr,
+                vertices.as_ptr() as *const f32 as *const c_void,
+                gl::DYNAMIC_DRAW,
+            );
 
             let stride = 8 * mem::size_of::<gl::types::GLfloat>() as gl::types::GLsizei;
             /* Describe data */
             gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, stride, ptr::null());
             gl::EnableVertexAttribArray(0);
-            gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, stride, (3 * mem::size_of::<gl::types::GLfloat>()) as *const c_void);
+            gl::VertexAttribPointer(
+                1,
+                3,
+                gl::FLOAT,
+                gl::FALSE,
+                stride,
+                (3 * mem::size_of::<gl::types::GLfloat>()) as *const c_void,
+            );
             gl::EnableVertexAttribArray(1);
-            gl::VertexAttribPointer(2, 2, gl::FLOAT, gl::FALSE, stride, (6 * mem::size_of::<gl::types::GLfloat>()) as *const c_void);
+            gl::VertexAttribPointer(
+                2,
+                2,
+                gl::FLOAT,
+                gl::FALSE,
+                stride,
+                (6 * mem::size_of::<gl::types::GLfloat>()) as *const c_void,
+            );
             gl::EnableVertexAttribArray(2);
 
             /* Bind EBO and data to it */
             gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
-            gl::BufferData(gl::ELEMENT_ARRAY_BUFFER, (num_indices * mem::size_of::<gl::types::GLfloat>() as u32) as gl::types::GLsizeiptr, (&indices).as_ptr() as *const i32 as *const c_void, gl::DYNAMIC_DRAW);
+            gl::BufferData(
+                gl::ELEMENT_ARRAY_BUFFER,
+                (num_indices * mem::size_of::<gl::types::GLfloat>() as u32)
+                    as gl::types::GLsizeiptr,
+                (&indices).as_ptr() as *const i32 as *const c_void,
+                gl::DYNAMIC_DRAW,
+            );
         }
 
         /* Assign values and return */
@@ -142,7 +186,7 @@ impl Model {
             vertex_array_object: vao,
             vertex_buffer_object: vbo,
             element_buffer_object: ebo,
-            num_indices
+            num_indices,
         }
     }
 
@@ -154,7 +198,12 @@ impl Model {
 
     pub fn draw(&self) {
         unsafe {
-            gl::DrawElements(gl::TRIANGLES, (self.num_indices) as i32, gl::UNSIGNED_INT, ptr::null());
+            gl::DrawElements(
+                gl::TRIANGLES,
+                (self.num_indices) as i32,
+                gl::UNSIGNED_INT,
+                ptr::null(),
+            );
         }
     }
 }

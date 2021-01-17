@@ -1,12 +1,8 @@
 #[derive(Clone)]
-pub struct Region {
-    
-}
+pub struct Region {}
 
 impl Region {
     pub fn new() -> Self {
-        Region {
-
-        }
+        Region {}
     }
 }

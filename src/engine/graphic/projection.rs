@@ -1,18 +1,12 @@
 use super::shader::Shader;
 
 #[derive(Clone)]
-pub struct Projection {
-    
-}
+pub struct Projection {}
 
 impl Projection {
-    pub fn new(path: &str) -> Projection{
-        Projection {
-            
-        }
+    pub fn new(path: &str) -> Projection {
+        Projection {}
     }
 
-    pub fn bind(&self, shader: &Shader) {
-
-    }
+    pub fn bind(&self, shader: &Shader) {}
 }
