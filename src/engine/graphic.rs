@@ -43,9 +43,18 @@ impl Graphic {
         let mut shaders: HashMap<String, shader::Shader> = HashMap::new();
         let mut textures: HashMap<String, texture::Texture> = HashMap::new();
 
-        let split_string = |s: &str, split: char| -> String {
+        let split_string_last = |s: &str, split: char| -> String {
             let s = s.split(split);
             match s.last() {
+                Some(s) => s,
+                None => panic!("Could not split string!"),
+            }
+            .to_string()
+        };
+
+        let split_string_first = |s: &str, split: char| -> String {
+            let mut s = s.split(split);
+            match s.next() {
                 Some(s) => s,
                 None => panic!("Could not split string!"),
             }
@@ -59,7 +68,7 @@ impl Graphic {
             .enumerate()
         {
             animations.insert(
-                split_string(&split_string(x, '/')[..], '.'),
+                split_string_first(&split_string_last(x, '/')[..], '.'),
                 animation::Animation::new(x),
             );
         }
@@ -70,7 +79,7 @@ impl Graphic {
             .iter()
             .enumerate()
         {
-            cameras.insert(split_string(x, '/'), camera::Camera::new(x));
+            cameras.insert(split_string_first(&split_string_last(x, '/')[..], '.'), camera::Camera::new(x));
         }
 
         for (_, x) in paths
@@ -79,7 +88,7 @@ impl Graphic {
             .iter()
             .enumerate()
         {
-            models.insert(split_string(x, '/'), model::Model::new(x.to_string()));
+            models.insert(split_string_first(&split_string_last(x, '/')[..], '.'), model::Model::new(x.to_string()));
         }
 
         for (_, x) in paths
@@ -88,7 +97,7 @@ impl Graphic {
             .iter()
             .enumerate()
         {
-            projections.insert(split_string(x, '/'), projection::Projection::new(x));
+            projections.insert(split_string_first(&split_string_last(x, '/')[..], '.'), projection::Projection::new(x));
         }
 
         for (_, x) in paths
@@ -97,7 +106,7 @@ impl Graphic {
             .iter()
             .enumerate()
         {
-            let string = split_string(x, '/');
+            let string = split_string_last(x, '/');
             let string = match string.split('.').next() {
                 Some(s) => s,
                 None => panic!("Could not split shader string!"),
@@ -121,7 +130,7 @@ impl Graphic {
             .iter()
             .enumerate()
         {
-            textures.insert(x.to_string(), texture::Texture::new(x.to_string()));
+            textures.insert(split_string_first(&split_string_last(x, '/')[..], '.'), texture::Texture::new(x.to_string()));
         }
 
         Graphic {
@@ -138,20 +147,20 @@ impl Graphic {
         let mut shader_name: String = String::new();
         let mut projection_name: String = String::new();
         let mut camera_name: String = String::new();
-        let mut model_name = name.to_string() + ".pmf";
-        let texture_name = name.to_string() + ".tga";
+        let mut model_name = name.to_string();
+        let texture_name = name.to_string();
 
         match dimension {
             ObjectType::Dimension2 => {
                 shader_name += "2d_default";
-                projection_name += "2d_default.json";
-                camera_name += "2d_default.json";
-                model_name = "2d_default.pmf".to_string();
+                projection_name += "2d_default";
+                camera_name += "2d_default";
+                model_name = "2d_default".to_string();
             }
             ObjectType::Dimension3 => {
                 shader_name += "3d_default";
-                projection_name += "3d_default.json";
-                camera_name += "3d_default.json";
+                projection_name += "3d_default";
+                camera_name += "3d_default";
             }
         }
 
@@ -242,7 +251,8 @@ pub struct Object {
 }
 
 impl Object {
-    pub fn add(&mut self, position: Vec3) {
+    pub fn add(&mut self, position: &Vec3) {
+        let position = (*position).clone();
         match &mut self.game_objects {
             Some(i) => {
                 i.push(ObjectInstance {
@@ -257,7 +267,8 @@ impl Object {
         }
     }
 
-    pub fn remove(&mut self, position: Vec3) {
+    pub fn remove(&mut self, position: &Vec3) {
+        let position = (*position).clone();
         let vec = match &mut self.game_objects {
             Some(i) => i,
             None => panic!("No object instance exists to remove!")

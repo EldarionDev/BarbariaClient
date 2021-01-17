@@ -83,17 +83,11 @@ impl<'b> Engine<'b> {
 
         if found == false {panic!("Object could not be removed because it was not found: {}", name)};
         let object_reference = self.objects.get_mut(object_index).unwrap();
-        object_reference.remove(pos);
+        object_reference.remove(&pos);
     }
 
 
     pub fn open_title_screen(&mut self) {
-        let title_screen_files = self.paths.resource_manager.get_assets("textures");
-        let title_screen_count = title_screen_files.len();
-        let random_title_screen = rand::thread_rng().gen_range(0..(title_screen_count - 1));
-        let random_title_screen = &title_screen_files[random_title_screen];
-        let random_title_screen = random_title_screen.split('.').next().unwrap();
-        self.register_object(self.graphic.create_object(random_title_screen, &graphic::ObjectType::Dimension2, &graphic::ObjectClass::GUI))
     }
 
     pub fn render_tick(&mut self) {
