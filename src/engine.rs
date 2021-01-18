@@ -1,23 +1,23 @@
 use std::fs;
 
 use crate::{game::Game, maths::Vec3};
-use game_object::{GameObject, gui_element};
+use game_object::{gui_element, GameObject};
 
 use super::Config;
 use rand::Rng;
 use serde_json::Value;
 
 mod events;
+mod game_object;
 mod graphic;
 mod physics;
 mod window;
-mod game_object;
 
 pub struct Engine<'b> {
     paths: &'b Config,
     game_window: window::Window,
     graphic: graphic::Graphic,
-    objects: Vec<graphic::Object>
+    objects: Vec<graphic::Object>,
 }
 
 impl<'b> Engine<'b> {
@@ -36,12 +36,12 @@ impl<'b> Engine<'b> {
                 json_content["screenHeight"].as_u64().unwrap() as u32,
             ),
             graphic: graphic::Graphic::new(paths),
-            objects: Vec::new()
+            objects: Vec::new(),
         }
     }
 
     pub fn add_object(&mut self, obj: impl game_object::GameObject) {
-        let mut create= true;
+        let mut create = true;
         let mut index = 0;
 
         for i in self.objects.iter() {
@@ -55,7 +55,11 @@ impl<'b> Engine<'b> {
 
         if create {
             index = 0;
-            self.register_object(self.graphic.create_object(obj.get_name(), obj.get_type(), obj.get_class()));
+            self.register_object(self.graphic.create_object(
+                obj.get_name(),
+                obj.get_type(),
+                obj.get_class(),
+            ));
             for i in self.objects.iter() {
                 if i.object_name == obj.get_name() {
                     break;
@@ -65,14 +69,14 @@ impl<'b> Engine<'b> {
             }
         }
 
-        let object_reference =  self.objects.get_mut(index).unwrap();
+        let object_reference = self.objects.get_mut(index).unwrap();
         object_reference.add(obj.get_position());
     }
 
     pub fn remove_object(&mut self, name: &str, pos: Vec3) {
         let mut object_index = 0;
         let mut found = false;
-        
+
         for i in self.objects.iter() {
             if i.object_name == name {
                 found = true;
@@ -82,14 +86,25 @@ impl<'b> Engine<'b> {
             }
         }
 
-        if found == false {panic!("Object could not be removed because it was not found: {}", name)};
+        if found == false {
+            panic!(
+                "Object could not be removed because it was not found: {}",
+                name
+            )
+        };
         let object_reference = self.objects.get_mut(object_index).unwrap();
         object_reference.remove(&pos);
     }
 
-
     pub fn open_title_screen(&mut self) {
-        let element = gui_element::GuiElement::new("mines", Vec3{x: 0.0, y: 0.0, z: 0.0});
+        let element = gui_element::GuiElement::new(
+            "mines",
+            Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+        );
         self.add_object(element);
     }
 

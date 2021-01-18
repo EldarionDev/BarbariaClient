@@ -1,4 +1,4 @@
-use crate::{Config, game::Game, maths::Vec3};
+use crate::{game::Game, maths::Vec3, Config};
 use std::collections::HashMap;
 
 mod animation;
@@ -15,7 +15,7 @@ pub enum ObjectClass {
     Lake,
     Terrain,
     GUI,
-    Building
+    Building,
 }
 
 #[derive(Clone)]
@@ -79,7 +79,10 @@ impl Graphic {
             .iter()
             .enumerate()
         {
-            cameras.insert(split_string_first(&split_string_last(x, '/')[..], '.'), camera::Camera::new(x));
+            cameras.insert(
+                split_string_first(&split_string_last(x, '/')[..], '.'),
+                camera::Camera::new(x),
+            );
         }
 
         for (_, x) in paths
@@ -88,7 +91,10 @@ impl Graphic {
             .iter()
             .enumerate()
         {
-            models.insert(split_string_first(&split_string_last(x, '/')[..], '.'), model::Model::new(x.to_string()));
+            models.insert(
+                split_string_first(&split_string_last(x, '/')[..], '.'),
+                model::Model::new(x.to_string()),
+            );
         }
 
         for (_, x) in paths
@@ -97,7 +103,10 @@ impl Graphic {
             .iter()
             .enumerate()
         {
-            projections.insert(split_string_first(&split_string_last(x, '/')[..], '.'), projection::Projection::new(x));
+            projections.insert(
+                split_string_first(&split_string_last(x, '/')[..], '.'),
+                projection::Projection::new(x),
+            );
         }
 
         for (_, x) in paths
@@ -130,7 +139,10 @@ impl Graphic {
             .iter()
             .enumerate()
         {
-            textures.insert(split_string_first(&split_string_last(x, '/')[..], '.'), texture::Texture::new(x.to_string()));
+            textures.insert(
+                split_string_first(&split_string_last(x, '/')[..], '.'),
+                texture::Texture::new(x.to_string()),
+            );
         }
 
         Graphic {
@@ -170,7 +182,7 @@ impl Graphic {
             ObjectClass::Settlement => shader_name += "_settlement",
             ObjectClass::Terrain => shader_name += "_terrain",
             ObjectClass::GUI => shader_name += "_gui",
-            ObjectClass::Building => shader_name += "_building"
+            ObjectClass::Building => shader_name += "_building",
         }
 
         let shader_ref: shader::Shader = match self.shaders.get(&shader_name) {
@@ -216,21 +228,21 @@ impl Graphic {
             projection: projection::Projection::new("test"),
             model: model_ref,
             texture: texture_ref,
-            game_objects: None
+            game_objects: None,
         }
     }
 
     pub fn draw(&self, obj: &Object) {
         let game_objects = match &obj.game_objects {
             Some(i) => i,
-            None => return
+            None => return,
         };
 
         obj.shader.bind();
         obj.projection.bind(&obj.shader);
         obj.camera.bind(&obj.shader);
         obj.texture.bind();
-        
+
         for i in game_objects.iter() {
             obj.model.bind(&i.position);
             obj.model.draw();
@@ -247,7 +259,7 @@ pub struct Object {
     projection: projection::Projection,
     model: model::Model,
     texture: texture::Texture,
-    game_objects: Option<Vec<ObjectInstance>>
+    game_objects: Option<Vec<ObjectInstance>>,
 }
 
 impl Object {
@@ -255,14 +267,10 @@ impl Object {
         let position = (*position).clone();
         match &mut self.game_objects {
             Some(i) => {
-                i.push(ObjectInstance {
-                    position
-                });
+                i.push(ObjectInstance { position });
             }
             None => {
-                self.game_objects = Some(vec![ObjectInstance {
-                    position
-                }]);
+                self.game_objects = Some(vec![ObjectInstance { position }]);
             }
         }
     }
@@ -271,7 +279,7 @@ impl Object {
         let position = (*position).clone();
         let vec = match &mut self.game_objects {
             Some(i) => i,
-            None => panic!("No object instance exists to remove!")
+            None => panic!("No object instance exists to remove!"),
         };
 
         let mut index = 0;
@@ -294,5 +302,5 @@ impl Object {
 }
 
 pub struct ObjectInstance {
-    position: Vec3
+    position: Vec3,
 }

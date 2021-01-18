@@ -1,4 +1,7 @@
-use crate::{engine::graphic::{ObjectClass, ObjectType}, maths::Vec3};
+use crate::{
+    engine::graphic::{ObjectClass, ObjectType},
+    maths::Vec3,
+};
 
 use super::GameObject;
 
@@ -6,7 +9,7 @@ pub struct GuiElement {
     position: Vec3,
     name: String,
     dimension: ObjectType,
-    class: ObjectClass
+    class: ObjectClass,
 }
 
 impl GameObject for GuiElement {
@@ -15,7 +18,7 @@ impl GameObject for GuiElement {
             position,
             name: name.to_string(),
             dimension: ObjectType::Dimension2,
-            class: ObjectClass::GUI
+            class: ObjectClass::GUI,
         }
     }
 
