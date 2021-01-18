@@ -1,6 +1,7 @@
 use std::fs;
 
 use crate::{game::Game, maths::Vec3};
+use game_object::{GameObject, gui_element};
 
 use super::Config;
 use rand::Rng;
@@ -88,6 +89,8 @@ impl<'b> Engine<'b> {
 
 
     pub fn open_title_screen(&mut self) {
+        let element = gui_element::GuiElement::new("mines", Vec3{x: 0.0, y: 0.0, z: 0.0});
+        self.add_object(element);
     }
 
     pub fn render_tick(&mut self) {

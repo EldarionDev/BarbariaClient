@@ -2,7 +2,7 @@ use crate::maths::Vec3;
 
 use super::graphic::{ObjectClass, ObjectType};
 
-mod gui_element;
+pub(crate) mod gui_element;
 
 pub trait GameObject {
     fn new(name: &str, position: Vec3) -> Self;
