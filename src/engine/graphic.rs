@@ -270,7 +270,11 @@ impl Object {
                 i.push(ObjectInstance { position });
             }
             None => {
+                /* If no GameObject of an Object has been initialized so far, load the Objects contents */
                 self.game_objects = Some(vec![ObjectInstance { position }]);
+                self.texture.load();
+                self.model.load();
+                self.shader.load();
             }
         }
     }

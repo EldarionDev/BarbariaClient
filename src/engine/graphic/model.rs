@@ -28,21 +28,32 @@ struct ModelVertex {
 
 #[derive(Clone)]
 pub struct Model {
-    vertex_array_object: u32,
-    vertex_buffer_object: u32,
-    element_buffer_object: u32,
-    num_indices: u32,
+    model_path: String,
+    vertex_array_object: Option<u32>,
+    vertex_buffer_object: Option<u32>,
+    element_buffer_object: Option<u32>,
+    num_indices: Option<u32>,
 }
 
 impl Model {
     pub fn new(model_path: String) -> Model {
+        Model {
+            model_path,
+            vertex_array_object: None,
+            vertex_buffer_object: None,
+            element_buffer_object: None,
+            num_indices: None
+        }
+    }
+
+    pub fn load(&mut self) {
         /* Read Model file */
         let mut vertices: Vec<ModelVertex> = Vec::new();
         let mut indices: Vec<u32> = Vec::new();
         let mut num_indices: u32 = 0;
         let mut num_vertices: u32 = 0;
 
-        let model_file = match File::open(model_path) {
+        let model_file = match File::open(self.model_path.clone()) {
             Ok(f) => f,
             Err(e) => panic!("Could not read model file: {}", e),
         };
@@ -183,26 +194,33 @@ impl Model {
             );
         }
 
-        /* Assign values and return */
-        Model {
-            vertex_array_object: vao,
-            vertex_buffer_object: vbo,
-            element_buffer_object: ebo,
-            num_indices,
-        }
+        self.vertex_array_object = Some(vao);
+        self.vertex_buffer_object = Some(vbo);
+        self.element_buffer_object = Some(ebo);
+        self.num_indices = Some(num_indices);
     }
 
     pub fn bind(&self, position: &Vec3) {
+        let vao = match self.vertex_array_object {
+            Some(i) => i,
+            None => panic!("Attempted to bind unitialized Model: {}", self.model_path)
+        };
+
         unsafe {
-            gl::BindVertexArray(self.vertex_array_object);
+            gl::BindVertexArray(vao);
         }
     }
 
     pub fn draw(&self) {
+        let num_indices = match self.num_indices  {
+            Some(i) => i,
+            None => panic!("Attempted to draw unitialized Model: {}", self.model_path)
+        };
+
         unsafe {
             gl::DrawElements(
                 gl::TRIANGLES,
-                (self.num_indices) as i32,
+                (num_indices) as i32,
                 gl::UNSIGNED_INT,
                 ptr::null(),
             );

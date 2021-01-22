@@ -2,20 +2,29 @@ use std::{ffi::CString, fs, ptr};
 
 #[derive(Clone)]
 pub struct Shader {
-    shader_program: u32,
+    shader_path: String,
+    shader_program: Option<u32>,
 }
 
 impl Shader {
     pub fn new(shader_base_path: String) -> Shader {
+        /* Assign values and return */
+        Shader { 
+            shader_path: shader_base_path,
+            shader_program: None
+        }
+    }
+
+    pub fn load(&mut self) {
         /* Parse shader files to CStrings */
-        let vertex_shader_path = shader_base_path.clone() + ".vs";
-        let fragment_shader_path = shader_base_path.clone() + ".fs";
+        let vertex_shader_path = self.shader_path.clone() + ".vs";
+        let fragment_shader_path = self.shader_path.clone() + ".fs";
 
         let vertex_shader_content = match fs::read_to_string(vertex_shader_path) {
             Ok(c) => c,
             Err(e) => panic!(
                 "Error while reading vertex shader of: {} because: {}",
-                shader_base_path, e
+                self.shader_path, e
             ),
         };
 
@@ -23,7 +32,7 @@ impl Shader {
             Ok(c) => c,
             Err(e) => panic!(
                 "Error while reading fragment shader of: {} because: {}",
-                shader_base_path, e
+                self.shader_path, e
             ),
         };
 
@@ -31,7 +40,7 @@ impl Shader {
             Ok(c) => c,
             Err(e) => panic!(
                 "Error while converting vertex shader of: {} to a CString because: {}",
-                shader_base_path, e
+                self.shader_path, e
             ),
         };
 
@@ -39,7 +48,7 @@ impl Shader {
             Ok(c) => c,
             Err(e) => panic!(
                 "Error while converting fragment shader of: {} to a CString because: {}",
-                shader_base_path, e
+                self.shader_path, e
             ),
         };
 
@@ -121,13 +130,17 @@ impl Shader {
             }
         }
 
-        /* Assign values and return */
-        Shader { shader_program }
+        self.shader_program = Some(shader_program);
     }
 
     pub fn bind(&self) {
+        let shader_program = match self.shader_program {
+            Some(i) => i,
+            None => panic!("Attempted to use unitialized shader: {}", self.shader_path)
+        };
+
         unsafe {
-            gl::UseProgram(self.shader_program);
+            gl::UseProgram(shader_program);
         }
     }
 }
