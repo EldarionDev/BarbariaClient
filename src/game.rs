@@ -75,4 +75,8 @@ impl Listener for Game {
     fn mouse_clicked(&mut self) {
         
     }
+
+    fn window_closed(&mut self) {
+        self.close = true;
+    }
 }
