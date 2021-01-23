@@ -1,25 +1,29 @@
 use std::{fs, fs::File, io::Write};
 
+use crate::engine::event::Listener;
+
 use super::Config;
 
 mod faction;
 mod map;
 
 #[derive(Clone)]
-pub struct Game<'a> {
+pub struct Game {
     /* Remove Option when JSON loading is implemented */
     factions: Option<Vec<faction::Faction>>,
     map: Option<map::Map>,
-    paths: &'a Config,
+    paths: Config,
+    pub close: bool
 }
 
-impl<'a> Game<'a> {
-    pub fn new(paths: &'a Config) -> Self {
+impl Game {
+    pub fn new(paths: Config) -> Self {
         /* Temporary till JSON loading */
         Game {
             factions: None,
             map: None,
             paths: paths,
+            close: false
         }
     }
 
@@ -59,5 +63,16 @@ impl<'a> Game<'a> {
             Ok(_) => (),
             Err(e) => panic!("Error while saving world: {}", e),
         }
+    }
+}
+
+
+impl Listener for Game {
+    fn key_pressed(&mut self) {
+        self.close = true;
+    }
+
+    fn mouse_clicked(&mut self) {
+        
     }
 }

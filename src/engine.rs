@@ -8,19 +8,18 @@ use rand::Rng;
 use serde_json::Value;
 use std::sync::mpsc::Receiver;
 
-mod events;
+pub(crate) mod event;
 mod game_object;
 mod graphic;
 mod physics;
 mod window;
-mod event_handler;
 
 pub struct Engine<'b> {
     paths: &'b Config,
     game_window: window::Window,
     graphic: graphic::Graphic,
     objects: Vec<graphic::Object>,
-    event_handler: event_handler::EventHandler
+    pub event_handler: event::EventHandler
 }
 
 impl<'b> Engine<'b> {
@@ -45,7 +44,7 @@ impl<'b> Engine<'b> {
             ),
             graphic: graphic::Graphic::new(paths),
             objects: Vec::new(),
-            event_handler: event_handler::EventHandler::new(receiver.unwrap(), glfw.unwrap())
+            event_handler: event::EventHandler::new(receiver.unwrap(), glfw.unwrap())
         }
     }
 

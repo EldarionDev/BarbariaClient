@@ -1,8 +1,11 @@
+use std::{cell::{RefCell, RefMut}, rc::Rc};
+
 mod engine;
 mod game;
 mod maths;
 mod resource_manager;
 
+#[derive(Clone)]
 pub struct Config {
     resource_manager: resource_manager::ResourceManager,
 }
@@ -27,14 +30,18 @@ fn main() {
         ),
     };
     program_config.resource_manager.set_world("world/");
+    
+    let mut game = game::Game::new(program_config.clone());
 
     let mut game_engine = engine::Engine::new(&program_config);
     game_engine.open_title_screen();
-    let game = game::Game::new(&program_config);
+
     game.load_world();
-    game.save_world();
+
+    game_engine.event_handler.register_event_object(&mut game);
 
     loop {
+        if game.close {break};
         unsafe {
             gl::ClearColor(0.6, 0.3, 0.2, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
