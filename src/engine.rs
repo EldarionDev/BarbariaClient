@@ -6,18 +6,21 @@ use game_object::{gui_element, GameObject};
 use super::Config;
 use rand::Rng;
 use serde_json::Value;
+use std::sync::mpsc::Receiver;
 
 mod events;
 mod game_object;
 mod graphic;
 mod physics;
 mod window;
+mod event_handler;
 
 pub struct Engine<'b> {
     paths: &'b Config,
     game_window: window::Window,
     graphic: graphic::Graphic,
     objects: Vec<graphic::Object>,
+    event_handler: event_handler::EventHandler
 }
 
 impl<'b> Engine<'b> {
@@ -29,14 +32,20 @@ impl<'b> Engine<'b> {
         let config_file_content: &str = &config_file_content[..];
         let json_content: Value = serde_json::from_str(config_file_content).unwrap();
 
+        let mut receiver: Option<Receiver<(f64, glfw::WindowEvent)>> = None;
+        let mut glfw: Option<glfw::Glfw> = None;
+
         Engine {
             paths,
             game_window: window::Window::new(
                 json_content["screenWidth"].as_u64().unwrap() as u32,
                 json_content["screenHeight"].as_u64().unwrap() as u32,
+                &mut receiver,
+                &mut glfw
             ),
             graphic: graphic::Graphic::new(paths),
             objects: Vec::new(),
+            event_handler: event_handler::EventHandler::new(receiver.unwrap(), glfw.unwrap())
         }
     }
 
@@ -119,6 +128,7 @@ impl<'b> Engine<'b> {
 
         let window_reference = &mut self.game_window;
         window_reference.update();
+        self.event_handler.trigger_event_listeners();
     }
 
     fn register_object(&mut self, obj: graphic::Object) {

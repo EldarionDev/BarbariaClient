@@ -1,3 +1,5 @@
+use std::sync::mpsc::Receiver;
+
 use glfw::Context;
 
 pub struct Window {
@@ -5,7 +7,7 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn new(screen_size_x: u32, screen_size_y: u32) -> Window {
+    pub fn new(screen_size_x: u32, screen_size_y: u32, window_event: &mut Option<Receiver<(f64, glfw::WindowEvent)>>, glfw_instance: &mut Option<glfw::Glfw>) -> Window {
         let mut glfw = match glfw::init(glfw::FAIL_ON_ERRORS) {
             Ok(g) => g,
             Err(e) => panic!("Could not initialize GLFW: {}", e),
@@ -18,7 +20,7 @@ impl Window {
         #[cfg(target_os = "macos")]
         glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
-        let (mut window, _) = glfw
+        let (mut window, event) = glfw
             .create_window(
                 screen_size_x,
                 screen_size_y,
@@ -32,7 +34,12 @@ impl Window {
 
         gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
 
-        Window { window }
+        *window_event = Some(event);
+        *glfw_instance = Some(glfw);
+
+        Window { 
+            window, 
+        }
     }
 
     pub fn update(&mut self) {

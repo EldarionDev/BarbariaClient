@@ -6,6 +6,8 @@ pub struct Vec3 {
     pub(crate) z: f64,
 }
 
+
+
 impl PartialEq for Vec3 {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y && self.z == other.z
