@@ -31,17 +31,18 @@ fn main() {
     };
     program_config.resource_manager.set_world("world/");
     
-    let mut game = game::Game::new(program_config.clone());
+    let game = game::Game::new(program_config.clone());
+    let game = Rc::new(RefCell::new(game));
 
     let mut game_engine = engine::Engine::new(&program_config);
     game_engine.open_title_screen();
 
-    game.load_world();
+    game.borrow_mut().load_world();
 
-    game_engine.event_handler.register_event_object(&mut game);
+    game_engine.event_handler.register_event_object(game.clone());
 
     loop {
-        if game.close {break};
+        if game.borrow().close {break};
         unsafe {
             gl::ClearColor(0.6, 0.3, 0.2, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);

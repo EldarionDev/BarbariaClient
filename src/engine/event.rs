@@ -4,7 +4,7 @@ pub struct EventHandler {
     window_event_handler: Receiver<(f64, glfw::WindowEvent)>,
     glfw_instance: glfw::Glfw,
     event_functions: Vec<fn()>,
-    event_objects: Vec<*mut dyn Listener>
+    event_objects: Vec<Rc<RefCell<dyn Listener>>>
 }
 
 impl EventHandler {
@@ -21,7 +21,7 @@ impl EventHandler {
         self.event_functions.push(listener_function);
     }
 
-    pub fn register_event_object(&mut self, object: *mut dyn Listener) {
+    pub fn register_event_object(&mut self, object: Rc<RefCell<dyn Listener>>) {
         self.event_objects.push(object);
     }
 
@@ -31,9 +31,9 @@ impl EventHandler {
         for(_, event) in glfw::flush_messages(&self.window_event_handler) {
             match event {
                 glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) => {
-                    unsafe {
-                        self.event_objects[0].as_mut().unwrap().key_pressed();
-                    }
+                    /* Assumes the registered event is always existing!!!!!!! */
+                    /* Later return slice to unregister event */
+                    self.event_objects[0].borrow_mut().key_pressed();
                 },
                 _ => {},
             }
