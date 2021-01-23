@@ -49,59 +49,29 @@ impl<'b> Engine<'b> {
     }
 
     pub fn add_object(&mut self, obj: impl game_object::GameObject) {
-        let mut create = true;
-        let mut index = 0;
-
-        for i in self.objects.iter() {
-            if i.object_name == obj.get_name() {
-                create = false;
-                break;
-            } else {
-                index += 1;
+        match self
+            .objects
+            .iter_mut()
+            .find(|o| obj.get_name() == o.object_name)
+        {
+            Some(o) => o,
+            None => {
+                self.register_object(self.graphic.create_object(
+                    obj.get_name(),
+                    obj.get_type(),
+                    obj.get_class(),
+                ));
+                self.objects.last_mut().unwrap() 
             }
         }
-
-        if create {
-            index = 0;
-            self.register_object(self.graphic.create_object(
-                obj.get_name(),
-                obj.get_type(),
-                obj.get_class(),
-            ));
-            for i in self.objects.iter() {
-                if i.object_name == obj.get_name() {
-                    break;
-                } else {
-                    index += 1;
-                }
-            }
-        }
-
-        let object_reference = self.objects.get_mut(index).unwrap();
-        object_reference.add(obj.get_position());
+        .add(obj.get_position());
     }
 
     pub fn remove_object(&mut self, name: &str, pos: Vec3) {
-        let mut object_index = 0;
-        let mut found = false;
-
-        for i in self.objects.iter() {
-            if i.object_name == name {
-                found = true;
-                break;
-            } else {
-                object_index += 1;
-            }
-        }
-
-        if found == false {
-            panic!(
-                "Object could not be removed because it was not found: {}",
-                name
-            )
-        };
-        let object_reference = self.objects.get_mut(object_index).unwrap();
-        object_reference.remove(&pos);
+        match self.objects.iter_mut().find(|o| o.object_name == name) {
+            Some(o) => o,
+            None => return
+        }.remove(&pos);
     }
 
     pub fn open_title_screen(&mut self) {

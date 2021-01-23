@@ -41,8 +41,7 @@ fn main() {
 
     game_engine.event_handler.register_event_object(game.clone());
 
-    loop {
-        if game.borrow().close {break};
+    while !game.borrow().close {
         unsafe {
             gl::ClearColor(0.6, 0.3, 0.2, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
