@@ -1,5 +1,6 @@
-use crate::{game::Game, maths::Vec3, Config};
+use crate::{game::Game, Config};
 use std::collections::HashMap;
+use glm::{Vec3, Vec4, Mat4};
 
 mod animation;
 mod camera;
@@ -193,15 +194,15 @@ impl Graphic {
             Some(i) => i.to_owned(),
         };
 
-        /*let camera_ref: camera::Camera = match self.cameras.get(&camera_name) {
+        let camera_ref: camera::Camera = match self.cameras.get(&camera_name) {
             None => panic!("Specified camera: {} could not be referenced while creating instance of: {}", camera_name, name),
             Some(i) => i.to_owned()
-        }; */
+        }; 
 
-        /* let projection_ref: projection::Projection = match self.projections.get(&camera_name) {
+        let projection_ref: projection::Projection = match self.projections.get(&camera_name) {
             None => panic!("Specified projection: {} could not be referenced while creating instance of: {}", projection_name, name),
             Some(i) => i.to_owned()
-        }; */
+        }; 
 
         let model_ref: model::Model = match self.models.get(&model_name) {
             None => panic!(
@@ -224,8 +225,8 @@ impl Graphic {
             class: class.clone(),
             dimension: dimension.clone(),
             shader: shader_ref,
-            camera: camera::Camera::new("bef"),
-            projection: projection::Projection::new("test"),
+            camera: camera_ref,
+            projection: projection_ref,
             model: model_ref,
             texture: texture_ref,
             game_objects: None,
@@ -244,6 +245,7 @@ impl Graphic {
         obj.texture.bind();
 
         for i in game_objects.iter() {
+
             obj.model.bind(&i.position);
             obj.model.draw();
         }
@@ -263,15 +265,15 @@ pub struct Object {
 }
 
 impl Object {
-    pub fn add(&mut self, position: &Vec3) {
+    pub fn add(&mut self, position: &Vec3, scale: &Vec3, rotation: &Vec4) {
         let position = (*position).clone();
         match &mut self.game_objects {
             Some(i) => {
-                i.push(ObjectInstance { position });
+                i.push(ObjectInstance { position, scale: *scale, rotation: *rotation });
             }
             None => {
                 /* If no GameObject of an Object has been initialized so far, load the Objects contents */
-                self.game_objects = Some(vec![ObjectInstance { position }]);
+                self.game_objects = Some(vec![ObjectInstance { position, scale: *scale, rotation: *rotation }]);
                 self.texture.load();
                 self.model.load();
                 self.shader.load();
@@ -307,4 +309,9 @@ impl Object {
 
 pub struct ObjectInstance {
     position: Vec3,
+    scale: Vec3,
+    rotation: Vec4
+}
+
+impl ObjectInstance {
 }

@@ -6,7 +6,7 @@ use std::{
     str::SplitWhitespace,
 };
 
-use crate::maths::Vec3;
+use glm::{Vec3};
 
 extern crate gl;
 

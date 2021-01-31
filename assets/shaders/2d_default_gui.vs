@@ -5,7 +5,9 @@ layout (location = 2) in vec2 aTexture;
 
 out vec2 texCoords;
 
+uniform mat4 projection;
+
 void main() {
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = projection * vec4(aPos, 1.0);
     texCoords = aTexture;
 }

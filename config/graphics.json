@@ -1,5 +1,5 @@
 {
-    "screenWidth": 400,
-    "screenHeight": 400,
+    "screenWidth": 1920,
+    "screenHeight": 1080,
     "windowMode": "Windowed"
-  }
+}

@@ -1,28 +1,33 @@
 use crate::{
-    engine::graphic::{ObjectClass, ObjectType},
-    maths::Vec3,
+    engine::graphic::{ObjectClass, ObjectType}
 };
+
+use glm::{Vec3, Vec4};
 
 use super::GameObject;
 
 pub struct GuiElement {
     position: Vec3,
+    scale: Vec3,
+    rotation: Vec4,
     name: String,
     dimension: ObjectType,
     class: ObjectClass,
 }
 
 impl GameObject for GuiElement {
-    fn new(name: &str, position: Vec3) -> Self {
+    fn new(name: &str, position: Vec3, scale: Vec3, rotation: Vec4) -> Self {
         GuiElement {
             position,
+            scale,
+            rotation,
             name: name.to_string(),
             dimension: ObjectType::Dimension2,
             class: ObjectClass::GUI,
         }
     }
 
-    fn get_position(&self) -> &crate::maths::Vec3 {
+    fn get_position(&self) -> &Vec3 {
         return &self.position;
     }
 
@@ -36,5 +41,13 @@ impl GameObject for GuiElement {
 
     fn get_class(&self) -> &crate::engine::graphic::ObjectClass {
         return &self.class;
+    }
+
+    fn get_scale(&self) -> &Vec3 {
+        return &self.scale;
+    }
+
+    fn get_rotation(&self) -> &Vec4 {
+        return &self.rotation;
     }
 }

@@ -2,7 +2,6 @@ use std::{cell::{RefCell, RefMut}, rc::Rc};
 
 mod engine;
 mod game;
-mod maths;
 mod resource_manager;
 
 #[derive(Clone)]

@@ -133,6 +133,13 @@ impl Shader {
         self.shader_program = Some(shader_program);
     }
 
+    pub fn get_id(&self) -> u32{
+        match self.shader_program {
+            Some(i) => i,
+            None => panic!("Attempte to retreive shader location without initalising shader!")
+        }
+    }
+
     pub fn bind(&self) {
         let shader_program = match self.shader_program {
             Some(i) => i,

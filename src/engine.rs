@@ -1,7 +1,8 @@
 use std::fs;
 
-use crate::{game::Game, maths::Vec3};
+use crate::{game::Game};
 use game_object::{gui_element, GameObject};
+use glm::{Vec3, Vec4};
 
 use super::Config;
 use rand::Rng;
@@ -64,7 +65,7 @@ impl<'b> Engine<'b> {
                 self.objects.last_mut().unwrap() 
             }
         }
-        .add(obj.get_position());
+        .add(obj.get_position(), obj.get_scale(), obj.get_rotation());
     }
 
     pub fn remove_object(&mut self, name: &str, pos: Vec3) {
@@ -82,6 +83,8 @@ impl<'b> Engine<'b> {
                 y: 0.0,
                 z: 0.0,
             },
+            Vec3 {x: 0.0, y: 0.0, z: 0.0},
+            Vec4{x: 0.0, y: 0.0, z: 0.0, w: 0.0}
         );
         self.add_object(element);
     }
@@ -97,7 +100,7 @@ impl<'b> Engine<'b> {
 
         let window_reference = &mut self.game_window;
         window_reference.update();
-        self.event_handler.trigger_event_listeners();
+        self.event_handler.do_window_tick();
     }
 
     fn register_object(&mut self, obj: graphic::Object) {

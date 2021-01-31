@@ -27,7 +27,7 @@ impl EventHandler {
         self.event_objects.push(object);
     }
 
-    pub fn trigger_event_listeners(&mut self) {
+    pub fn do_window_tick(&mut self) {
         /* Process Window events */
         self.glfw_instance.poll_events();
         for(_, event) in glfw::flush_messages(&self.window_event_handler) {
@@ -56,6 +56,10 @@ impl EventHandler {
                 _ => {}
             }
         }
+    }
+
+    pub fn do_game_tick(&mut self) {
+        
     }
 }
 

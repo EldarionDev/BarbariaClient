@@ -43,6 +43,10 @@ impl Game {
         }
     }
 
+    pub fn game_tick(&mut self) {
+
+    }
+
     pub fn save_world(&self) {
         let file =
             File::create(self.paths.resource_manager.get_world().to_owned() + "test_faction.json");
