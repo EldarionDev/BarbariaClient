@@ -200,7 +200,7 @@ impl Model {
         self.num_indices = Some(num_indices);
     }
 
-    pub fn bind(&self, position: &Vec3) {
+    pub fn bind(&self) {
         let vao = match self.vertex_array_object {
             Some(i) => i,
             None => panic!("Attempted to bind unitialized Model: {}", self.model_path)

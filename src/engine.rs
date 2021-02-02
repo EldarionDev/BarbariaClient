@@ -65,7 +65,7 @@ impl<'b> Engine<'b> {
                 self.objects.last_mut().unwrap() 
             }
         }
-        .add(obj.get_position(), obj.get_scale(), obj.get_rotation());
+        .add(obj.get_position(), obj.get_scale(), obj.get_rotation(), obj.get_rotation_angle());
     }
 
     pub fn remove_object(&mut self, name: &str, pos: Vec3) {
@@ -79,12 +79,13 @@ impl<'b> Engine<'b> {
         let element = gui_element::GuiElement::new(
             "mines",
             Vec3 {
-                x: 0.0,
-                y: 0.0,
+                x: -0.5,
+                y: -0.5,
                 z: 0.0,
             },
-            Vec3 {x: 0.0, y: 0.0, z: 0.0},
-            Vec4{x: 0.0, y: 0.0, z: 0.0, w: 0.0}
+            Vec3 {x: 0.5, y: 0.5, z: 1.0},
+            Vec3{x: 1.0, y: 1.0, z: 1.0},
+            0.0
         );
         self.add_object(element);
     }

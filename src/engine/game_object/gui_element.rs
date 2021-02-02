@@ -9,18 +9,20 @@ use super::GameObject;
 pub struct GuiElement {
     position: Vec3,
     scale: Vec3,
-    rotation: Vec4,
+    rotation: Vec3,
+    rotation_angle: f32,
     name: String,
     dimension: ObjectType,
     class: ObjectClass,
 }
 
 impl GameObject for GuiElement {
-    fn new(name: &str, position: Vec3, scale: Vec3, rotation: Vec4) -> Self {
+    fn new(name: &str, position: Vec3, scale: Vec3, rotation: Vec3, rotation_angle: f32) -> Self {
         GuiElement {
             position,
             scale,
             rotation,
+            rotation_angle,
             name: name.to_string(),
             dimension: ObjectType::Dimension2,
             class: ObjectClass::GUI,
@@ -47,7 +49,11 @@ impl GameObject for GuiElement {
         return &self.scale;
     }
 
-    fn get_rotation(&self) -> &Vec4 {
+    fn get_rotation(&self) -> &Vec3 {
         return &self.rotation;
+    }
+
+    fn get_rotation_angle(&self) -> f32 {
+        return self.rotation_angle;
     }
 }

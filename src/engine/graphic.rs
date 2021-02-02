@@ -1,5 +1,5 @@
 use crate::{game::Game, Config};
-use std::collections::HashMap;
+use std::{collections::HashMap, ffi::CString};
 use glm::{Vec3, Vec4, Mat4};
 
 mod animation;
@@ -245,9 +245,33 @@ impl Graphic {
         obj.texture.bind();
 
         for i in game_objects.iter() {
+            /* Calculate the ModelMatrix for each GameObject and push it to the shader */
+            self.calc_bind_model_matrix(i, &obj.shader);
 
-            obj.model.bind(&i.position);
+            /* Bind and draw each GameObject instance */
+            obj.model.bind();
             obj.model.draw();
+        }
+    }
+
+    fn calc_bind_model_matrix(&self, obj: &ObjectInstance, shader: &shader::Shader) {
+        let model_matrix = glm::mat4(
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        );
+        let model_matrix = glm::ext::translate(&model_matrix, obj.position);
+        let model_matrix = glm::ext::scale(&model_matrix, obj.scale);
+        let model_matrix = glm::ext::rotate(&model_matrix, glm::builtin::radians(obj.rotation_angle), obj.rotation);
+        
+        let string = CString::new("model_matrix").unwrap();
+        unsafe {
+            let shader_location = gl::GetUniformLocation(shader.get_id(), string.as_bytes().as_ptr() as *const i8);
+            if shader_location == -1 {
+                panic!("Shader location for projection matrix is not existing.");
+            }
+            gl::UniformMatrix4fv(shader_location, 1, 0, model_matrix[0].as_array().as_ptr());
         }
     }
 }
@@ -265,15 +289,15 @@ pub struct Object {
 }
 
 impl Object {
-    pub fn add(&mut self, position: &Vec3, scale: &Vec3, rotation: &Vec4) {
+    pub fn add(&mut self, position: &Vec3, scale: &Vec3, rotation: &Vec3, rotation_angle: f32) {
         let position = (*position).clone();
         match &mut self.game_objects {
             Some(i) => {
-                i.push(ObjectInstance { position, scale: *scale, rotation: *rotation });
+                i.push(ObjectInstance { position, scale: *scale, rotation: *rotation, rotation_angle});
             }
             None => {
                 /* If no GameObject of an Object has been initialized so far, load the Objects contents */
-                self.game_objects = Some(vec![ObjectInstance { position, scale: *scale, rotation: *rotation }]);
+                self.game_objects = Some(vec![ObjectInstance { position, scale: *scale, rotation: *rotation, rotation_angle }]);
                 self.texture.load();
                 self.model.load();
                 self.shader.load();
@@ -310,7 +334,8 @@ impl Object {
 pub struct ObjectInstance {
     position: Vec3,
     scale: Vec3,
-    rotation: Vec4
+    rotation: Vec3,
+    rotation_angle: f32
 }
 
 impl ObjectInstance {
