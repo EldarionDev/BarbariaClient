@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use crate::engine::{self, game_object::gui};
 
+use super::listener::{self, Listener};
+
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Screen {
     pub name: String,
@@ -36,8 +38,8 @@ impl Screen {
 
     }
 
-    pub fn mouse_clicked(&self, cursor_pos: (f64, f64)) {
-        println!("pos: {:?}", cursor_pos);
+    pub fn mouse_clicked(&self, listener: &mut Listener, cursor_pos: (f64, f64), screen_size: (f32, f32)) {
+        
     }
 }
 

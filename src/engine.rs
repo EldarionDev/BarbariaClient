@@ -17,7 +17,7 @@ mod window;
 
 pub struct Engine<'b> {
     paths: &'b Config,
-    game_window: window::Window,
+    pub game_window: window::Window,
     graphic: graphic::Graphic,
     objects: Vec<graphic::Object>,
     pub event_handler: event::EventHandler

@@ -29,11 +29,12 @@ fn main() {
         ),
     };
     program_config.resource_manager.set_world("world/");
-    
-    let game = game::Game::new(program_config.clone());
-    let game = Rc::new(RefCell::new(game));
 
     let mut game_engine = engine::Engine::new(&program_config);
+    
+    let game = game::Game::new(program_config.clone(), (game_engine.game_window.size_x as f32, game_engine.game_window.size_y as f32));
+    let game = Rc::new(RefCell::new(game));
+
     //game_engine.open_title_screen();
 
     game.borrow_mut().load_world();

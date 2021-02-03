@@ -10,6 +10,7 @@ use super::Config;
 mod faction;
 mod map;
 mod screen;
+mod listener;
 
 pub struct Game {
     /* Remove Option when JSON loading is implemented */
@@ -19,12 +20,13 @@ pub struct Game {
     paths: Config,
     pub close: bool,
     screens: Vec<screen::Screen>,
-    event_codes: Vec<String>,
-    open_screens: Vec<screen::Screen>
+    open_screens: Vec<screen::Screen>,
+    listener: listener::Listener,
+    screen_size: (f32, f32)
 }
 
 impl Game {
-    pub fn new(paths: Config) -> Self {
+    pub fn new(paths: Config, screen_size: (f32, f32)) -> Self {
         let mut screens: Vec<screen::Screen> = Vec::new();
         
         for (_, screen_path) in paths.resource_manager.get_assets("screens").iter().enumerate() {
@@ -49,8 +51,9 @@ impl Game {
             paths: paths,
             close: false,
             screens,
-            event_codes: Vec::new(),
-            open_screens: Vec::new()
+            open_screens: Vec::new(),
+            listener: listener::Listener::new(),
+            screen_size
         }
     }
 
@@ -80,7 +83,11 @@ impl Game {
     }
 
     pub fn game_tick(&mut self) {
-        for s in &self.event_codes {
+        for s in &self.listener.event_codes {
+            if s == "" {
+                continue;
+            }
+
             if s == "exit" {
                 self.close = true;
             }
@@ -127,7 +134,7 @@ impl Game {
     }
 
     pub fn push_event_code(&mut self, code: &str) {
-        self.event_codes.push(code.to_string());
+        self.listener.event_codes.push(code.to_string());
     }
 }
 
@@ -138,11 +145,11 @@ impl Listener for Game {
     }
 
     fn mouse_clicked(&mut self, cursor_pos: (f64, f64)) {
-        println!("Pos: {:?}", cursor_pos);
-        match &mut self.open_screens.last() {
+        let screen = match self.open_screens.last() {
             Some(i) => i,
             None => return
-        }.mouse_clicked(cursor_pos);
+        };
+        screen.mouse_clicked(&mut self.listener, cursor_pos,  self.screen_size);
     }
 
     fn window_closed(&mut self) {
