@@ -49,6 +49,7 @@ fn main() {
         }
 
         game_engine.render_tick();
+        game.borrow_mut().game_tick();
     }
 
     game.borrow().save_world();

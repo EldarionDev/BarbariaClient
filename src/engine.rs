@@ -75,16 +75,6 @@ impl<'b> Engine<'b> {
         }.remove(&pos);
     }
 
-    pub fn open_title_screen(&mut self) {
-        let mut gui = gui::Gui::new((1000.0, 1000.0), (0.0, 0.0));
-        gui.add_background(self, "mines", (0.0, 0.0), (1000.0, 1000.0));
-        gui.add_element(self, "main_menu", (0.0, 175.0), (100.0, 650.0));
-        gui.add_element(self, "exit_button", (22.0, 275.0),  (75.0, 75.0));
-        gui.add_element(self, "settings_button", (22.0, 400.0),  (75.0, 75.0));
-        gui.add_element(self, "multi_player_button", (22.0, 525.0),  (75.0, 75.0));
-        gui.add_element(self, "exit_button", (22.0, 650.0),  (75.0, 75.0));
-    }
-
     pub fn render_tick(&mut self) {
         let object_reference = &mut self.objects;
 

@@ -40,7 +40,7 @@ impl EventHandler {
 
                 glfw::WindowEvent::MouseButton(_, _, _) => {
                     for o in self.event_objects.iter() {
-                        o.borrow_mut().mouse_clicked();
+                        o.borrow_mut().mouse_clicked(self.current_cursor_pos);
                     }
                 }
 
@@ -65,6 +65,6 @@ impl EventHandler {
 
 pub trait Listener {
     fn key_pressed(&mut self);
-    fn mouse_clicked(&mut self);
+    fn mouse_clicked(&mut self, cursor_pos: (f64, f64));
     fn window_closed(&mut self);
 }

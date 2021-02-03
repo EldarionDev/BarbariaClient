@@ -14,4 +14,8 @@ impl Map {
             regions: None,
         }
     }
+
+    pub fn retreive_event_code(&mut self, code: &str) {
+
+    }
 }

@@ -18,4 +18,8 @@ impl Faction {
             settlements: None,
         }
     }
+
+    pub fn retreive_event_code(&mut self, code: &str) {
+
+    }
 }

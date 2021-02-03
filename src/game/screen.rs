@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use crate::engine::{self, game_object::gui};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Screen {
     pub name: String,
     position: (f32, f32),
@@ -36,20 +36,21 @@ impl Screen {
 
     }
 
-    pub fn mouse_clicked(&self) {
-        
+    pub fn mouse_clicked(&self, cursor_pos: (f64, f64)) {
+        println!("pos: {:?}", cursor_pos);
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct TextElement {
+    event_name: String,
     position: (f32, f32),
     fontsize: (f32, f32),
     font: String,
     text: String
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct TextureElement {
     position: (f32, f32),
     size: (f32, f32),

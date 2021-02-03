@@ -14,10 +14,13 @@ mod screen;
 pub struct Game {
     /* Remove Option when JSON loading is implemented */
     factions: Option<Vec<faction::Faction>>,
+    player_faction: Option<faction::Faction>,
     map: Option<map::Map>,
     paths: Config,
     pub close: bool,
-    screens: Vec<screen::Screen>
+    screens: Vec<screen::Screen>,
+    event_codes: Vec<String>,
+    open_screens: Vec<screen::Screen>
 }
 
 impl Game {
@@ -41,17 +44,21 @@ impl Game {
         /* Temporary till JSON loading */
         Game {
             factions: None,
+            player_faction: None,
             map: None,
             paths: paths,
             close: false,
-            screens
+            screens,
+            event_codes: Vec::new(),
+            open_screens: Vec::new()
         }
     }
 
-    pub fn open_screen(&self, name: &str, engine: &mut engine::Engine) {
+    pub fn open_screen(&mut self, name: &str, engine: &mut engine::Engine) {
         for s in &self.screens {
             if s.name == name {
                 s.open(engine);
+                self.open_screens.push((*s).clone());
             }
         }
     }
@@ -73,7 +80,28 @@ impl Game {
     }
 
     pub fn game_tick(&mut self) {
+        for s in &self.event_codes {
+            if s == "exit" {
+                self.close = true;
+            }
 
+            if s == "close" {
+                match self.screens.last() {
+                    Some(i) => i,
+                    None => panic!("Critical error occurred")
+                }.close();
+            }
+
+            match &mut self.map {
+                Some(i) => i,
+                None => continue
+            }.retreive_event_code(&s[..]);
+
+            match &mut self.player_faction {
+                Some(i) => i,
+                None => continue
+            }.retreive_event_code(&s[..]);
+        }
     }
 
     pub fn save_world(&self) {
@@ -97,6 +125,10 @@ impl Game {
             Err(e) => panic!("Error while saving world: {}", e),
         }
     }
+
+    pub fn push_event_code(&mut self, code: &str) {
+        self.event_codes.push(code.to_string());
+    }
 }
 
 
@@ -105,8 +137,12 @@ impl Listener for Game {
         self.close = true;
     }
 
-    fn mouse_clicked(&mut self) {
-        
+    fn mouse_clicked(&mut self, cursor_pos: (f64, f64)) {
+        println!("Pos: {:?}", cursor_pos);
+        match &mut self.open_screens.last() {
+            Some(i) => i,
+            None => return
+        }.mouse_clicked(cursor_pos);
     }
 
     fn window_closed(&mut self) {
