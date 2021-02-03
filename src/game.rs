@@ -1,30 +1,55 @@
-use std::{fs, fs::File, io::Write};
+use std::{borrow::BorrowMut, fs, fs::File, io::Write, ops::Deref};
 
-use crate::engine::event::Listener;
+use fs::read_to_string;
+use screen::TextureElement;
+
+use crate::engine::{self, event::Listener};
 
 use super::Config;
 
 mod faction;
 mod map;
+mod screen;
 
-#[derive(Clone)]
 pub struct Game {
     /* Remove Option when JSON loading is implemented */
     factions: Option<Vec<faction::Faction>>,
     map: Option<map::Map>,
     paths: Config,
-    pub close: bool
+    pub close: bool,
+    screens: Vec<screen::Screen>
 }
 
 impl Game {
     pub fn new(paths: Config) -> Self {
+        let mut screens: Vec<screen::Screen> = Vec::new();
+        
+        for (_, screen_path) in paths.resource_manager.get_assets("screens").iter().enumerate() {
+            let screen_path_content = &match fs::read_to_string(screen_path) {
+                Ok(f) => f,
+                Err(e) => panic!("Could not read JSON of faction file because: {}", e)
+            }[..];
+
+            let screen: screen::Screen = match serde_json::from_str(screen_path_content) {
+                Ok(s) => s,
+                Err(e) => panic!("Could not create Screen from json: {}", e)
+            };
+
+            screens.push(screen);
+        }
+
         /* Temporary till JSON loading */
         Game {
             factions: None,
             map: None,
             paths: paths,
-            close: false
+            close: false,
+            screens
         }
+    }
+
+    pub fn open_screen(name: &str) {
+
     }
 
     pub fn load_world(&self) {
