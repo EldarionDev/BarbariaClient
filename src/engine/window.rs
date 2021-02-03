@@ -4,6 +4,8 @@ use glfw::Context;
 
 pub struct Window {
     window: glfw::Window,
+    pub size_x: u32,
+    pub size_y: u32
 }
 
 impl Window {
@@ -39,6 +41,8 @@ impl Window {
 
         Window { 
             window, 
+            size_x: screen_size_x,
+            size_y: screen_size_y
         }
     }
 

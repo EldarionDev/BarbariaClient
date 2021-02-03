@@ -2,7 +2,9 @@ use glm::{Vec3, Vec4};
 
 use super::graphic::{ObjectClass, ObjectType};
 
+pub(crate) mod coordinate_transform;
 pub(crate) mod gui_element;
+pub(crate) mod gui;
 
 pub trait GameObject {
     fn new(name: &str, position: Vec3, scale: Vec3, rotation: Vec3, rotation_angle: f32) -> Self;

@@ -1,7 +1,7 @@
 use std::fs;
 
 use crate::{game::Game};
-use game_object::{gui_element, GameObject};
+use game_object::{gui, gui_element, GameObject};
 use glm::{Vec3, Vec4};
 
 use super::Config;
@@ -76,18 +76,13 @@ impl<'b> Engine<'b> {
     }
 
     pub fn open_title_screen(&mut self) {
-        let element = gui_element::GuiElement::new(
-            "mines",
-            Vec3 {
-                x: -0.5,
-                y: -0.5,
-                z: 0.0,
-            },
-            Vec3 {x: 0.5, y: 0.5, z: 1.0},
-            Vec3{x: 1.0, y: 1.0, z: 1.0},
-            0.0
-        );
-        self.add_object(element);
+        let mut gui = gui::Gui::new((1000.0, 1000.0), (0.0, 0.0));
+        gui.add_background(self, "mines", (0.0, 0.0), (1000.0, 1000.0));
+        gui.add_element(self, "main_menu", (0.0, 175.0), (100.0, 650.0));
+        gui.add_element(self, "exit_button", (22.0, 275.0),  (75.0, 75.0));
+        gui.add_element(self, "settings_button", (22.0, 400.0),  (75.0, 75.0));
+        gui.add_element(self, "multi_player_button", (22.0, 525.0),  (75.0, 75.0));
+        gui.add_element(self, "exit_button", (22.0, 650.0),  (75.0, 75.0));
     }
 
     pub fn render_tick(&mut self) {

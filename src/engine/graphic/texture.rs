@@ -29,19 +29,20 @@ impl Texture {
          }
  
          /* Load texture as image */
-         let image = image::open(&Path::new(&self.texture_path)).expect("Failed to load texture");
-         let image_data = image.raw_pixels();
+         let mut image = image::open(&Path::new(&self.texture_path)).expect("Failed to load texture");
+         image = image.flipv();
+         let image_data = image.to_rgba().into_raw();
  
          /* Attach image to OpenGL texture */
          unsafe {
              gl::TexImage2D(
                  gl::TEXTURE_2D,
                  0,
-                 gl::RGB as i32,
+                 gl::RGBA as i32,
                  image.width() as i32,
                  image.height() as i32,
                  0,
-                 gl::RGB,
+                 gl::RGBA,
                  gl::UNSIGNED_BYTE,
                  &image_data[0] as *const u8 as *const c_void,
              );

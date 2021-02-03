@@ -263,7 +263,7 @@ impl Graphic {
         );
         let model_matrix = glm::ext::translate(&model_matrix, obj.position);
         let model_matrix = glm::ext::scale(&model_matrix, obj.scale);
-        let model_matrix = glm::ext::rotate(&model_matrix, glm::builtin::radians(obj.rotation_angle), obj.rotation);
+        //let model_matrix = glm::ext::rotate(&model_matrix, glm::builtin::radians(obj.rotation_angle), obj.rotation);
         
         let string = CString::new("model_matrix").unwrap();
         unsafe {
