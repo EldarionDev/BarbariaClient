@@ -48,8 +48,12 @@ impl Game {
         }
     }
 
-    pub fn open_screen(name: &str) {
-
+    pub fn open_screen(&self, name: &str, engine: &mut engine::Engine) {
+        for s in &self.screens {
+            if s.name == name {
+                s.open(engine);
+            }
+        }
     }
 
     pub fn load_world(&self) {

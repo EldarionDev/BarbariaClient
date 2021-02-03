@@ -10,7 +10,7 @@ use serde_json::Value;
 use std::sync::mpsc::Receiver;
 
 pub(crate) mod event;
-mod game_object;
+pub(crate) mod game_object;
 mod graphic;
 mod physics;
 mod window;

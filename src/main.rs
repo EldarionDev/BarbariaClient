@@ -34,11 +34,13 @@ fn main() {
     let game = Rc::new(RefCell::new(game));
 
     let mut game_engine = engine::Engine::new(&program_config);
-    game_engine.open_title_screen();
+    //game_engine.open_title_screen();
 
     game.borrow_mut().load_world();
 
     game_engine.event_handler.register_event_object(game.clone());
+
+    game.borrow_mut().open_screen("main_menu", &mut game_engine);
 
     while !game.borrow().close {
         unsafe {
