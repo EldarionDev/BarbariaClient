@@ -1,6 +1,10 @@
+extern crate freetype;
+
 use crate::{game::Game, Config};
 use std::{collections::HashMap, ffi::CString};
 use glm::{Vec3, Vec4, Mat4};
+use freetype::Library;
+
 
 mod animation;
 mod camera;
@@ -8,6 +12,7 @@ mod model;
 mod projection;
 mod shader;
 mod texture;
+mod font;
 
 #[derive(Clone)]
 pub enum ObjectClass {
@@ -16,7 +21,7 @@ pub enum ObjectClass {
     Lake,
     Terrain,
     GUI,
-    Building,
+    Building
 }
 
 #[derive(Clone)]
@@ -43,6 +48,11 @@ impl Graphic {
         let mut projections: HashMap<String, projection::Projection> = HashMap::new();
         let mut shaders: HashMap<String, shader::Shader> = HashMap::new();
         let mut textures: HashMap<String, texture::Texture> = HashMap::new();
+
+        let font_engine = match Library::init() {
+            Ok(i) => i,
+            Err(e) => panic!("Failed to initialize the font engine because of: {}", e)
+        };
 
         let split_string_last = |s: &str, split: char| -> String {
             let s = s.split(split);
