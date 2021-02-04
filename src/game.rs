@@ -58,7 +58,7 @@ impl Game {
     }
 
     pub fn open_screen(&mut self, name: &str, engine: &mut engine::Engine) {
-        for s in &self.screens {
+        for s in &mut self.screens {
             if s.name == name {
                 s.open(engine);
                 self.open_screens.push((*s).clone());
@@ -83,13 +83,14 @@ impl Game {
     }
 
     pub fn game_tick(&mut self) {
-        for s in &self.listener.event_codes {
+        for s in &self.listener.event_codes[..] {
             if s == "" {
                 continue;
             }
 
             if s == "exit" {
                 self.close = true;
+                return;
             }
 
             if s == "close" {

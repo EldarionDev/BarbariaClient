@@ -54,4 +54,5 @@ fn main() {
     }
 
     game.borrow().save_world();
+    return;
 }

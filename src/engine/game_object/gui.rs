@@ -1,11 +1,12 @@
 use crate::engine;
-
 use super::{GameObject, coordinate_transform::to_gl_space, gui_element};
+use serde::{Deserialize, Serialize};
 
 
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Gui {
-    size: (f32, f32),
-    position: (f32, f32),
+    pub size: (f32, f32),
+    pub position: (f32, f32),
 }
 
 impl Gui {
