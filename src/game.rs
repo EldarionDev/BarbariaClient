@@ -26,7 +26,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(paths: Config, screen_size: (f32, f32)) -> Self {
+    pub fn new(paths: Config) -> Self {
         let mut screens: Vec<screen::Screen> = Vec::new();
         
         for (_, screen_path) in paths.resource_manager.get_assets("screens").iter().enumerate() {
@@ -53,7 +53,7 @@ impl Game {
             screens,
             open_screens: Vec::new(),
             listener: listener::Listener::new(),
-            screen_size
+            screen_size: (0.0, 0.0)
         }
     }
 
@@ -82,7 +82,7 @@ impl Game {
         }
     }
 
-    pub fn game_tick(&mut self) {
+    pub fn game_tick(&mut self, send: &mut Vec<f32>, receive: Vec<f32>) {
         for s in &self.listener.event_codes[..] {
             if s == "" {
                 continue;

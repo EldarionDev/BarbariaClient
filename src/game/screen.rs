@@ -24,6 +24,7 @@ impl Screen {
 
         for e in &self.texture_elements {
             gui.add_element(engine, &e.name[..], e.position, e.size);
+            gui.add_letter(engine, 'f', e.position, e.size);
         }
 
         self.gui = Some(gui);

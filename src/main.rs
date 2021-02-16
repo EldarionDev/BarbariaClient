@@ -1,8 +1,10 @@
-use std::{cell::{RefCell, RefMut}, rc::Rc};
+use std::{cell::{RefCell, RefMut}, rc::Rc, thread, sync::{mpsc, Mutex, Arc}};
 
 mod engine;
 mod game;
 mod resource_manager;
+mod networking;
+mod protocol;
 
 #[derive(Clone)]
 pub struct Config {
@@ -30,29 +32,98 @@ fn main() {
     };
     program_config.resource_manager.set_world("world/");
 
-    let mut game_engine = engine::Engine::new(&program_config);
-    
-    let game = game::Game::new(program_config.clone(), (game_engine.game_window.size_x as f32, game_engine.game_window.size_y as f32));
-    let game = Rc::new(RefCell::new(game));
+    let program_config_engine_clone = program_config.clone();
+    let program_config_game_clone = program_config.clone();
 
-    //game_engine.open_title_screen();
+    let (engine_sender, engine_receiver): (mpsc::Sender<Vec<f32>>, mpsc::Receiver<Vec<f32>>) = mpsc::channel();
+    let (engine_sender, engine_receiver) = (Arc::new(Mutex::new(engine_sender)), Arc::new(Mutex::new(engine_receiver)));
+    let (game_sender, game_receiver): (mpsc::Sender<Vec<f32>>, mpsc::Receiver<Vec<f32>>) = mpsc::channel();
+    let (game_sender, game_receiver) = (Arc::new(Mutex::new(game_sender)), Arc::new(Mutex::new(game_receiver)));
+    let (network_sender, network_receiver): (mpsc::Sender<Vec<f32>>, mpsc::Receiver<Vec<f32>>) = mpsc::channel();
+    let (network_sender, network_receiver) = (Arc::new(Mutex::new(network_sender)), Arc::new(Mutex::new(network_receiver)));
 
-    game.borrow_mut().load_world();
 
-    game_engine.event_handler.register_event_object(game.clone());
+    /* The Engine SENDS user input to the game such as keyboard input,
+    it RECEIVES Game events such as what to draw */
+    let game_sender_c = Arc::clone(&game_sender);
 
-    game.borrow_mut().open_screen("main_menu", &mut game_engine);
+    let engine_thread = thread::spawn(move || {
+        let mut game_engine = engine::Engine::new(program_config_engine_clone);
 
-    while !game.borrow().close {
-        unsafe {
-            gl::ClearColor(0.6, 0.3, 0.2, 1.0);
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+        loop {
+            let mut send = Vec::new();
+            let receive = match engine_receiver.lock().unwrap().recv() {
+                Ok(i) => i,
+                Err(e) => panic!("Could not fetch events for engine loop to execute: {}", e)
+            };
+
+            game_engine.render_tick(&mut send, receive);
+
+            match game_sender_c.lock().unwrap().send(send) {
+                Ok(i) => i,
+                Err(e) => panic!("Could not send engine events to the game: {}", e)
+            }
         }
+    });
 
-        game_engine.render_tick();
-        game.borrow_mut().game_tick();
-    }
+    /* The Game SENDS data to the engine such as what to draw,
+    the Game SENDS data to the Network to inform the other players client what this player has done
+    the Game RECEIVES user input by the engine such as keyboard input,
+    the Game RECEIVES networking events to perform changes done by the other player */
+    let engine_sender_c = Arc::clone(&engine_sender);
+    let network_sender_c = Arc::clone(&network_sender);
 
-    game.borrow().save_world();
+    let game_thread = thread::spawn(move || {
+        /* Later let game load screen size itself */
+        let mut game = game::Game::new(program_config_game_clone);
+        
+        loop {
+            let mut send = Vec::new();
+            let receive = match game_receiver.lock().unwrap().recv() {
+                Ok(i) => i,
+                Err(e) => panic!("Could not fetch events for engine loop to execute: {}", e)
+            };
+
+            game.game_tick(&mut send, receive);
+
+            match engine_sender_c.lock().unwrap().send(send.clone()) {
+                Ok(i) => i,
+                Err(e) => panic!("Could not send game events to the engine: {}", e)
+            }
+
+            match network_sender_c.lock().unwrap().send(send.clone()) {
+                Ok(i) => i,
+                Err(e) => panic!("Could not send game events to the network: {}", e)
+            }
+        }
+    });
+
+    /* The Network SENDS data to the game, what the other player has done,
+    the Network RECEIVES data from the engine, what this player has done */
+    let game_sender_c = Arc::clone(&game_sender);
+
+    let network_thread = thread::spawn(move || {
+        let mut network = networking::Network::new();
+
+        loop {
+            let mut send = Vec::new();
+            let receive = match network_receiver.lock().unwrap().recv() {
+                Ok(i) => i,
+                Err(e) => panic!("Could not fetch events for networking loop to execute: {}", e)
+            };
+
+            network.update(&mut send, receive);
+
+            match game_sender_c.lock().unwrap().send(send) {
+                Ok(i) => i,
+                Err(e) => panic!("Could not send networking events to the game: {}", e)
+            }
+        }
+    });
+
+    engine_thread.join().unwrap();
+    game_thread.join().unwrap();
+    network_thread.join().unwrap();
+
     return;
 }

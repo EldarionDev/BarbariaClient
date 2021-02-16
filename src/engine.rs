@@ -15,16 +15,16 @@ mod graphic;
 mod physics;
 mod window;
 
-pub struct Engine<'b> {
-    paths: &'b Config,
+pub struct Engine {
+    paths: Config,
     pub game_window: window::Window,
     graphic: graphic::Graphic,
     objects: Vec<graphic::Object>,
     pub event_handler: event::EventHandler
 }
 
-impl<'b> Engine<'b> {
-    pub fn new(paths: &'b Config) -> Engine<'b> {
+impl Engine {
+    pub fn new(paths: Config) -> Engine {
         //let mut graphic = graphic::Graphic::new(&paths);
         //let object = graphic::Object::new(&mut graphic, "mines", graphic::ObjectType::Dimension2, graphic::ObjectClass::GUI);
         let config_file = paths.resource_manager.get_config("graphics.json");
@@ -34,6 +34,7 @@ impl<'b> Engine<'b> {
 
         let mut receiver: Option<Receiver<(f64, glfw::WindowEvent)>> = None;
         let mut glfw: Option<glfw::Glfw> = None;
+        let paths_clone = paths.clone();
 
         Engine {
             paths,
@@ -43,13 +44,13 @@ impl<'b> Engine<'b> {
                 &mut receiver,
                 &mut glfw
             ),
-            graphic: graphic::Graphic::new(paths),
+            graphic: graphic::Graphic::new(paths_clone),
             objects: Vec::new(),
             event_handler: event::EventHandler::new(receiver.unwrap(), glfw.unwrap())
         }
     }
 
-    pub fn add_object(&mut self, obj: impl game_object::GameObject) {
+    pub fn add_object(&mut self, sign:char, obj: impl game_object::GameObject) {
         match self
             .objects
             .iter_mut()
@@ -65,7 +66,7 @@ impl<'b> Engine<'b> {
                 self.objects.last_mut().unwrap() 
             }
         }
-        .add(obj.get_position(), obj.get_scale(), obj.get_rotation(), obj.get_rotation_angle());
+        .add(sign, obj.get_position(), obj.get_scale(), obj.get_rotation(), obj.get_rotation_angle());
     }
 
     pub fn remove_object(&mut self, name: &str, pos: Vec3) {
@@ -75,7 +76,12 @@ impl<'b> Engine<'b> {
         }.remove(&pos);
     }
 
-    pub fn render_tick(&mut self) {
+    pub fn render_tick(&mut self, send: &mut Vec<f32>, receive: Vec<f32>) {
+        unsafe {
+            gl::ClearColor(0.6, 0.3, 0.2, 1.0);
+            gl::Clear(gl::COLOR_BUFFER_BIT);
+        }
+
         let object_reference = &mut self.objects;
 
         let graphic_reference = &mut self.graphic;
@@ -115,6 +121,6 @@ impl<'b> Engine<'b> {
     }
 }
 
-impl<'a> Drop for Engine<'a> {
+impl Drop for Engine {
     fn drop(&mut self) {}
 }

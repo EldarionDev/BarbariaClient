@@ -12,7 +12,6 @@ mod model;
 mod projection;
 mod shader;
 mod texture;
-mod font;
 
 #[derive(Clone)]
 pub enum ObjectClass {
@@ -21,7 +20,8 @@ pub enum ObjectClass {
     Lake,
     Terrain,
     GUI,
-    Building
+    Building,
+    Font
 }
 
 #[derive(Clone)]
@@ -41,15 +41,14 @@ pub struct Graphic {
 }
 
 impl Graphic {
-    pub fn new(paths: &Config) -> Self {
+    pub fn new(paths: Config) -> Self {
         let mut animations: HashMap<String, animation::Animation> = HashMap::new();
         let mut cameras: HashMap<String, camera::Camera> = HashMap::new();
         let mut models: HashMap<String, model::Model> = HashMap::new();
         let mut projections: HashMap<String, projection::Projection> = HashMap::new();
         let mut shaders: HashMap<String, shader::Shader> = HashMap::new();
         let mut textures: HashMap<String, texture::Texture> = HashMap::new();
-
-        let font_engine = match Library::init() {
+        let mut font_engine = match Library::init() {
             Ok(i) => i,
             Err(e) => panic!("Failed to initialize the font engine because of: {}", e)
         };
@@ -162,7 +161,7 @@ impl Graphic {
             models,
             projections,
             shaders,
-            textures,
+            textures
         }
     }
 
@@ -171,6 +170,7 @@ impl Graphic {
         let mut projection_name: String = String::new();
         let mut camera_name: String = String::new();
         let mut model_name = name.to_string();
+        let font_name = "prince_valiant".to_string();
         let texture_name = name.to_string();
 
         match dimension {
@@ -194,6 +194,7 @@ impl Graphic {
             ObjectClass::Terrain => shader_name += "_terrain",
             ObjectClass::GUI => shader_name += "_gui",
             ObjectClass::Building => shader_name += "_building",
+            ObjectClass::Font => shader_name += "_gui"
         }
 
         let shader_ref: shader::Shader = match self.shaders.get(&shader_name) {
@@ -230,6 +231,7 @@ impl Graphic {
             Some(i) => i.to_owned(),
         };
 
+
         Object {
             object_name: name.to_string(),
             class: class.clone(),
@@ -239,7 +241,7 @@ impl Graphic {
             projection: projection_ref,
             model: model_ref,
             texture: texture_ref,
-            game_objects: None,
+            game_objects: None
         }
     }
 
@@ -252,11 +254,17 @@ impl Graphic {
         obj.shader.bind();
         obj.projection.bind(&obj.shader);
         obj.camera.bind(&obj.shader);
-        obj.texture.bind();
+        
+        match obj.class {
+            ObjectClass::Font => (),
+            _ => obj.texture.bind()
+        }
+
 
         for i in game_objects.iter() {
             /* Calculate the ModelMatrix for each GameObject and push it to the shader */
             self.calc_bind_model_matrix(i, &obj.shader);
+
 
             /* Bind and draw each GameObject instance */
             obj.model.bind();
@@ -299,15 +307,15 @@ pub struct Object {
 }
 
 impl Object {
-    pub fn add(&mut self, position: &Vec3, scale: &Vec3, rotation: &Vec3, rotation_angle: f32) {
+    pub fn add(&mut self, name: char, position: &Vec3, scale: &Vec3, rotation: &Vec3, rotation_angle: f32) {
         let position = (*position).clone();
         match &mut self.game_objects {
             Some(i) => {
-                i.push(ObjectInstance { position, scale: *scale, rotation: *rotation, rotation_angle});
+                i.push(ObjectInstance { position, name: name, scale: *scale, rotation: *rotation, rotation_angle});
             }
             None => {
                 /* If no GameObject of an Object has been initialized so far, load the Objects contents */
-                self.game_objects = Some(vec![ObjectInstance { position, scale: *scale, rotation: *rotation, rotation_angle }]);
+                self.game_objects = Some(vec![ObjectInstance { position, name: name, scale: *scale, rotation: *rotation, rotation_angle }]);
                 self.texture.load();
                 self.model.load();
                 self.shader.load();
@@ -342,6 +350,7 @@ impl Object {
 }
 
 pub struct ObjectInstance {
+    name: char,
     position: Vec3,
     scale: Vec3,
     rotation: Vec3,
