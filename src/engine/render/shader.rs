@@ -1,13 +1,15 @@
 use std::{ffi::CString, fs, ptr};
 
+use super::{Bindable, RetShader};
+
 #[derive(Clone)]
 pub struct Shader {
     shader_path: String,
     shader_program: Option<u32>,
 }
 
-impl Shader {
-    pub fn new(shader_base_path: String) -> Shader {
+impl Bindable for Shader {
+    fn new(shader_base_path: String) -> Shader {
         /* Assign values and return */
         Shader { 
             shader_path: shader_base_path,
@@ -15,7 +17,7 @@ impl Shader {
         }
     }
 
-    pub fn load(&mut self) {
+    fn load(&mut self) {
         /* Parse shader files to CStrings */
         let vertex_shader_path = self.shader_path.clone() + ".vs";
         let fragment_shader_path = self.shader_path.clone() + ".fs";
@@ -133,14 +135,7 @@ impl Shader {
         self.shader_program = Some(shader_program);
     }
 
-    pub fn get_id(&self) -> u32{
-        match self.shader_program {
-            Some(i) => i,
-            None => panic!("Attempte to retreive shader location without initalising shader!")
-        }
-    }
-
-    pub fn bind(&self) {
+    fn bind(&self) {
         let shader_program = match self.shader_program {
             Some(i) => i,
             None => panic!("Attempted to use unitialized shader: {}", self.shader_path)
@@ -150,4 +145,17 @@ impl Shader {
             gl::UseProgram(shader_program);
         }
     }
+}
+
+impl RetShader for Shader {
+    fn get_shader(&self) -> u32{
+        match self.shader_program {
+            Some(i) => i,
+            None => panic!("Attempte to retreive shader location without initalising shader!")
+        }
+    }
+}
+
+impl Shader {
+    
 }

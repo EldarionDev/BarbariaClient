@@ -8,6 +8,8 @@ use std::{
 
 use glm::{Vec3};
 
+use super::{Bindable, Renderable};
+
 extern crate gl;
 
 enum ReadMode {
@@ -35,8 +37,8 @@ pub struct Model {
     num_indices: Option<u32>,
 }
 
-impl Model {
-    pub fn new(model_path: String) -> Model {
+impl Bindable for Model {
+    fn new(model_path: String) -> Self {
         Model {
             model_path,
             vertex_array_object: None,
@@ -46,7 +48,7 @@ impl Model {
         }
     }
 
-    pub fn load(&mut self) {
+    fn load(&mut self) {
         /* Read Model file */
         let mut vertices: Vec<ModelVertex> = Vec::new();
         let mut indices: Vec<u32> = Vec::new();
@@ -200,7 +202,7 @@ impl Model {
         self.num_indices = Some(num_indices);
     }
 
-    pub fn bind(&self) {
+    fn bind(&self) {
         let vao = match self.vertex_array_object {
             Some(i) => i,
             None => panic!("Attempted to bind unitialized Model: {}", self.model_path)
@@ -210,8 +212,10 @@ impl Model {
             gl::BindVertexArray(vao);
         }
     }
+}
 
-    pub fn draw(&self) {
+impl Renderable for Model {
+    fn render(&self) {
         let num_indices = match self.num_indices  {
             Some(i) => i,
             None => panic!("Attempted to draw unitialized Model: {}", self.model_path)

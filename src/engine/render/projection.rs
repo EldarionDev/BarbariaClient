@@ -2,15 +2,15 @@ use std::{convert::TryInto, ffi::CString, fs, u32};
 
 use serde_json::Value;
 
-use super::shader::Shader;
+use super::{Bindable, Pushable, shader::Shader};
 
 #[derive(Clone)]
 pub struct Projection {
     projection_matrix: glm::Mat4
 }
 
-impl Projection {
-    pub fn new(path: &str) -> Projection {
+impl Bindable for Projection {
+    fn new(path: String) -> Self {
         let projection_file_content: String = fs::read_to_string(path).unwrap().parse().unwrap();
         let projection_file_content = &projection_file_content[..];
         let json_content: Value = serde_json::from_str(projection_file_content).unwrap();
@@ -42,10 +42,20 @@ impl Projection {
         }
     }
 
-    pub fn bind(&self, shader: &Shader) {
+    fn load(&mut self) {
+
+    }
+
+    fn bind(&self) {
+        
+    }
+}
+
+impl Pushable for Projection {
+    fn push(&mut self, shader: u32) {
         let string = CString::new("projection").unwrap();
         unsafe {
-            let shader_location = gl::GetUniformLocation(shader.get_id(), string.as_bytes().as_ptr() as *const i8);
+            let shader_location = gl::GetUniformLocation(shader, string.as_bytes().as_ptr() as *const i8);
             if shader_location == -1 {
                 panic!("Shader location for projection matrix is not existing.");
             }

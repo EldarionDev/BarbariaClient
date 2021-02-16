@@ -26,6 +26,8 @@ impl GameCommand {
     pub const AlterSettlement: f32 = 2.0;
     pub const AlterFactionStats: f32 = 3.0;
     pub const AddBuilding: f32 = 4.0;
+    pub const LoadWorld: f32 = 5.0;
+    pub const SaveWorld: f32 = 5.5;
 }
 
 #[non_exhaustive]
@@ -45,4 +47,5 @@ pub struct NetworkCommand;
 
 impl NetworkCommand {
     pub const SendData: f32 = 0.0;
+    pub const StopNetwork: f32 = 1.0;
 }

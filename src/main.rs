@@ -42,7 +42,6 @@ fn main() {
     let (network_sender, network_receiver): (mpsc::Sender<Vec<f32>>, mpsc::Receiver<Vec<f32>>) = mpsc::channel();
     let (network_sender, network_receiver) = (Arc::new(Mutex::new(network_sender)), Arc::new(Mutex::new(network_receiver)));
 
-
     /* The Engine SENDS user input to the game such as keyboard input,
     it RECEIVES Game events such as what to draw */
     let game_sender_c = Arc::clone(&game_sender);

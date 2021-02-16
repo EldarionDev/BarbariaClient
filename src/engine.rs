@@ -1,7 +1,6 @@
 use std::fs;
 
 use crate::{game::Game};
-use game_object::{gui, gui_element, GameObject};
 use glm::{Vec3, Vec4};
 
 use super::Config;
@@ -10,113 +9,25 @@ use serde_json::Value;
 use std::sync::mpsc::Receiver;
 
 pub(crate) mod event;
-pub(crate) mod game_object;
-mod graphic;
+mod render;
 mod physics;
 mod window;
 
 pub struct Engine {
     paths: Config,
-    pub game_window: window::Window,
-    graphic: graphic::Graphic,
-    objects: Vec<graphic::Object>,
-    pub event_handler: event::EventHandler
 }
 
 impl Engine {
     pub fn new(paths: Config) -> Engine {
-        //let mut graphic = graphic::Graphic::new(&paths);
-        //let object = graphic::Object::new(&mut graphic, "mines", graphic::ObjectType::Dimension2, graphic::ObjectClass::GUI);
-        let config_file = paths.resource_manager.get_config("graphics.json");
-        let config_file_content: String = fs::read_to_string(config_file).unwrap().parse().unwrap();
-        let config_file_content: &str = &config_file_content[..];
-        let json_content: Value = serde_json::from_str(config_file_content).unwrap();
-
-        let mut receiver: Option<Receiver<(f64, glfw::WindowEvent)>> = None;
-        let mut glfw: Option<glfw::Glfw> = None;
-        let paths_clone = paths.clone();
-
         Engine {
             paths,
-            game_window: window::Window::new(
-                json_content["screenWidth"].as_u64().unwrap() as u32,
-                json_content["screenHeight"].as_u64().unwrap() as u32,
-                &mut receiver,
-                &mut glfw
-            ),
-            graphic: graphic::Graphic::new(paths_clone),
-            objects: Vec::new(),
-            event_handler: event::EventHandler::new(receiver.unwrap(), glfw.unwrap())
         }
-    }
-
-    pub fn add_object(&mut self, sign:char, obj: impl game_object::GameObject) {
-        match self
-            .objects
-            .iter_mut()
-            .find(|o| obj.get_name() == o.object_name)
-        {
-            Some(o) => o,
-            None => {
-                self.register_object(self.graphic.create_object(
-                    obj.get_name(),
-                    obj.get_type(),
-                    obj.get_class(),
-                ));
-                self.objects.last_mut().unwrap() 
-            }
-        }
-        .add(sign, obj.get_position(), obj.get_scale(), obj.get_rotation(), obj.get_rotation_angle());
-    }
-
-    pub fn remove_object(&mut self, name: &str, pos: Vec3) {
-        match self.objects.iter_mut().find(|o| o.object_name == name) {
-            Some(o) => o,
-            None => return
-        }.remove(&pos);
     }
 
     pub fn render_tick(&mut self, send: &mut Vec<f32>, receive: Vec<f32>) {
         unsafe {
             gl::ClearColor(0.6, 0.3, 0.2, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
-        }
-
-        let object_reference = &mut self.objects;
-
-        let graphic_reference = &mut self.graphic;
-
-        for i in object_reference.iter() {
-            graphic_reference.draw(i);
-        }
-
-        let window_reference = &mut self.game_window;
-        window_reference.update();
-        self.event_handler.do_window_tick();
-    }
-
-    fn register_object(&mut self, obj: graphic::Object) {
-        self.objects.push(obj);
-    }
-
-    fn unregister_object(&mut self, name: &str) {
-        let object_reference = &mut self.objects;
-
-        let mut index = 0;
-        let mut found = false;
-        for i in object_reference.iter() {
-            if i.object_name == name {
-                found = true;
-                break;
-            } else {
-                index += 1;
-            }
-        }
-
-        if found {
-            object_reference.remove(index);
-        } else {
-            panic!("Could not remove specified object: {}", name);
         }
     }
 }
