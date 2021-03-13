@@ -142,7 +142,7 @@ impl Game {
 
 impl Listener for Game {
     fn key_pressed(&mut self) {
-        self.close = true;
+    
     }
 
     fn mouse_clicked(&mut self, cursor_pos: (f64, f64)) {
