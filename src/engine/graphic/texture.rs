@@ -1,16 +1,14 @@
 use image::GenericImage;
 use std::{ffi::c_void, path::Path};
 
-use super::Bindable;
-
 #[derive(Clone)]
 pub struct Texture {
     texture_path: String,
     texture_id: Option<u32>,
 }
 
-impl Bindable for Texture {
-    fn new(texture_path: String) -> Self {
+impl Texture {
+    pub fn new(texture_path: String) -> Texture {
         /* Assign values and return */
         Texture {
             texture_path,
@@ -18,7 +16,7 @@ impl Bindable for Texture {
         }
     }
 
-    fn load(&mut self) {
+    pub fn load(&mut self) {
          /* Create OpenGL texture */
          let mut opengl_texture: u32 = 0;
          unsafe {
@@ -53,7 +51,7 @@ impl Bindable for Texture {
          self.texture_id = Some(opengl_texture);
     }
 
-    fn bind(&self) {
+    pub fn bind(&self) {
         let texture_id = match self.texture_id {
             Some(i) => i,
             None => panic!("Attempted to use unitialized Texture: {}", self.texture_path)
