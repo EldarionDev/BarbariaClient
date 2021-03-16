@@ -6,7 +6,7 @@ use super::shader::Shader;
 
 #[derive(Clone)]
 pub struct Projection {
-    projection_matrix: glm::Mat4
+    projection_matrix: glm::Mat4,
 }
 
 impl Projection {

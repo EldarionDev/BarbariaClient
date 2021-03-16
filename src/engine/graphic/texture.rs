@@ -5,6 +5,7 @@ use std::{ffi::c_void, path::Path};
 pub struct Texture {
     texture_path: String,
     texture_id: Option<u32>,
+    loaded: bool
 }
 
 impl Texture {
@@ -13,10 +14,13 @@ impl Texture {
         Texture {
             texture_path,
             texture_id: None,
+            loaded: false
         }
     }
 
     pub fn load(&mut self) {
+        if self.loaded == true {return;}
+
          /* Create OpenGL texture */
          let mut opengl_texture: u32 = 0;
          unsafe {
@@ -49,6 +53,8 @@ impl Texture {
              gl::GenerateMipmap(gl::TEXTURE_2D);
          }
          self.texture_id = Some(opengl_texture);
+
+        self.loaded = true;
     }
 
     pub fn bind(&self) {

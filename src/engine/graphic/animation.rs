@@ -1,8 +1,12 @@
 #[derive(Clone)]
-pub struct Animation {}
+pub struct Animation {
+    loaded: bool
+}
 
 impl Animation {
     pub fn new(path: &str) -> Animation {
-        Animation {}
+        Animation {
+            loaded: false
+        }
     }
 }

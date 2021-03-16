@@ -1,11 +1,13 @@
 use super::shader::Shader;
 
 #[derive(Clone)]
-pub struct Camera {}
+pub struct Camera {
+}
 
 impl Camera {
     pub fn new(path: &str) -> Camera {
-        Camera {}
+        Camera {
+        }
     }
 
     pub fn bind(&self, shader: &Shader) {}

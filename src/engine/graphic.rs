@@ -14,7 +14,7 @@ mod font;
 
 
 pub struct Graphic<'a> {
-    render_objects: Vec<Box<dyn Render>>,
+    render_queue: Vec<Box<dyn Render>>,
     render_units: Vec<RenderUnit>,
     render_texts: Vec<RenderText<'a>>
 }
@@ -167,7 +167,7 @@ impl<'a> Graphic<'a> {
         }
 
         Graphic {
-            render_objects: Vec::new(),
+            render_queue: Vec::new(),
             render_texts: Vec::new(),
             render_units
         }
@@ -187,7 +187,7 @@ impl<'a> Graphic<'a> {
         }
 
         unit.render_objects.push(render_object);
-        self.render_objects.push(Box::new(unit.clone()));
+        self.render_queue.push(Box::new(unit.clone()));
 
         &unit.render_objects.last().unwrap().name
     }
@@ -205,7 +205,7 @@ impl<'a> Graphic<'a> {
     }
 
     pub fn render(&mut self) {
-        for i in self.render_objects.iter() {
+        for i in self.render_queue.iter() {
             i.render();
         }
     }

@@ -33,6 +33,7 @@ pub struct Model {
     vertex_buffer_object: Option<u32>,
     element_buffer_object: Option<u32>,
     num_indices: Option<u32>,
+    loaded: bool
 }
 
 impl Model {
@@ -42,11 +43,14 @@ impl Model {
             vertex_array_object: None,
             vertex_buffer_object: None,
             element_buffer_object: None,
-            num_indices: None
+            num_indices: None,
+            loaded: false
         }
     }
 
     pub fn load(&mut self) {
+        if self.loaded == true {return;}
+
         /* Read Model file */
         let mut vertices: Vec<ModelVertex> = Vec::new();
         let mut indices: Vec<u32> = Vec::new();
@@ -198,6 +202,8 @@ impl Model {
         self.vertex_buffer_object = Some(vbo);
         self.element_buffer_object = Some(ebo);
         self.num_indices = Some(num_indices);
+
+        self.loaded = true;
     }
 
     pub fn bind(&self) {
