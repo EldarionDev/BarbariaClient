@@ -4,6 +4,7 @@ use std::{ffi::CString, fs, ptr};
 pub struct Shader {
     shader_path: String,
     shader_program: Option<u32>,
+    loaded: bool
 }
 
 impl Shader {
@@ -11,11 +12,16 @@ impl Shader {
         /* Assign values and return */
         Shader { 
             shader_path: shader_base_path,
-            shader_program: None
+            shader_program: None,
+            loaded: false
         }
     }
 
     pub fn load(&mut self) {
+        if self.loaded == true {
+            return;
+        } 
+
         /* Parse shader files to CStrings */
         let vertex_shader_path = self.shader_path.clone() + ".vs";
         let fragment_shader_path = self.shader_path.clone() + ".fs";
@@ -131,6 +137,7 @@ impl Shader {
         }
 
         self.shader_program = Some(shader_program);
+        self.loaded = true;
     }
 
     pub fn get_id(&self) -> u32{

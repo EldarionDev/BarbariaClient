@@ -1,8 +1,10 @@
-use std::fs;
+use std::{fs, time::{SystemTime, UNIX_EPOCH}};
 
 use crate::{game::Game};
 use game_object::{gui, gui_element, GameObject};
 use glm::{Vec3, Vec4};
+
+use self::graphic::RenderObject;
 
 use super::Config;
 use rand::Rng;
@@ -18,8 +20,7 @@ mod window;
 pub struct Engine<'b> {
     paths: &'b Config,
     pub game_window: window::Window,
-    graphic: graphic::Graphic,
-    objects: Vec<graphic::Object>,
+    graphic: graphic::Graphic<'b>,
     pub event_handler: event::EventHandler
 }
 
@@ -44,74 +45,28 @@ impl<'b> Engine<'b> {
                 &mut glfw
             ),
             graphic: graphic::Graphic::new(paths),
-            objects: Vec::new(),
             event_handler: event::EventHandler::new(receiver.unwrap(), glfw.unwrap())
         }
     }
 
-    pub fn add_object(&mut self, obj: impl game_object::GameObject) {
-        match self
-            .objects
-            .iter_mut()
-            .find(|o| obj.get_name() == o.object_name)
-        {
-            Some(o) => o,
-            None => {
-                self.register_object(self.graphic.create_object(
-                    obj.get_name(),
-                    obj.get_type(),
-                    obj.get_class(),
-                ));
-                self.objects.last_mut().unwrap() 
-            }
-        }
-        .add(obj.get_position(), obj.get_scale(), obj.get_rotation(), obj.get_rotation_angle());
+    pub fn register_render_object(&mut self, render_name: String, position: Vec3, rotation: Vec3, rotation_angle: f32, scale: Vec3) -> String{
+        /* Later generate name with current system time and return the string */
+        let name = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos().to_string();
+        let return_name = name.clone();
+
+        self.graphic.add_object(render_name, RenderObject::new(name, position, rotation, rotation_angle, scale));
+
+        return_name
     }
 
-    pub fn remove_object(&mut self, name: &str, pos: Vec3) {
-        match self.objects.iter_mut().find(|o| o.object_name == name) {
-            Some(o) => o,
-            None => return
-        }.remove(&pos);
+    pub fn unregister_render_object() {
+
     }
 
     pub fn render_tick(&mut self) {
-        let object_reference = &mut self.objects;
-
-        let graphic_reference = &mut self.graphic;
-
-        for i in object_reference.iter() {
-            graphic_reference.draw(i);
-        }
-
-        let window_reference = &mut self.game_window;
-        window_reference.update();
-        self.event_handler.do_window_tick();
-    }
-
-    fn register_object(&mut self, obj: graphic::Object) {
-        self.objects.push(obj);
-    }
-
-    fn unregister_object(&mut self, name: &str) {
-        let object_reference = &mut self.objects;
-
-        let mut index = 0;
-        let mut found = false;
-        for i in object_reference.iter() {
-            if i.object_name == name {
-                found = true;
-                break;
-            } else {
-                index += 1;
-            }
-        }
-
-        if found {
-            object_reference.remove(index);
-        } else {
-            panic!("Could not remove specified object: {}", name);
-        }
+        self.graphic.render();
+        self.game_window.update();
+        self.event_handler.process_events();
     }
 }
 
