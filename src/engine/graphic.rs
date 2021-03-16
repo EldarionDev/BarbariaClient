@@ -14,6 +14,7 @@ mod font;
 
 
 pub struct Graphic<'a> {
+    render_objects: Vec<Box<dyn Render>>,
     render_units: Vec<RenderUnit>,
     render_texts: Vec<RenderText<'a>>
 }
@@ -166,6 +167,7 @@ impl<'a> Graphic<'a> {
         }
 
         Graphic {
+            render_objects: Vec::new(),
             render_texts: Vec::new(),
             render_units
         }
@@ -185,6 +187,8 @@ impl<'a> Graphic<'a> {
         }
 
         unit.render_objects.push(render_object);
+        self.render_objects.push(Box::new(unit.clone()));
+
         &unit.render_objects.last().unwrap().name
     }
 
@@ -201,22 +205,13 @@ impl<'a> Graphic<'a> {
     }
 
     pub fn render(&mut self) {
-        for i in self.render_units.iter() {
-            if i.render_objects.is_empty() {continue;}
-            i.shader.bind();
-            i.projection.bind(&i.shader);
-            i.camera.bind(&i.shader);
-            i.texture.bind();
-
-            for j in i.render_objects.iter() {
-                j.calc_bind_model_matrix(&i.shader);
-                i.model.bind();
-                i.model.draw();
-            }
+        for i in self.render_objects.iter() {
+            i.render();
         }
     }
 }
 
+#[derive(Clone)]
 pub struct RenderUnit {
     name: String,
     animation: animation::Animation,
@@ -232,6 +227,22 @@ impl RenderUnit {
 
 }
 
+impl Render for RenderUnit {
+    fn render(&self) {
+        if self.render_objects.is_empty() {return;}
+        self.shader.bind();
+        self.projection.bind(&self.shader);
+        self.camera.bind(&self.shader);
+        self.texture.bind();
+
+        for j in self.render_objects.iter() {
+                j.calc_bind_model_matrix(&self.shader);
+                self.model.bind();
+                self.model.draw();
+            }
+    }
+}
+
 pub struct RenderText<'a> {
     font: &'a font::Font,
     text: String,
@@ -242,6 +253,7 @@ impl <'a> RenderText<'a> {
 
 }
 
+#[derive(Clone)]
 pub struct RenderObject {
     name: String,
     position: Vec3,
@@ -281,4 +293,8 @@ impl RenderObject {
             gl::UniformMatrix4fv(shader_location, 1, 0, model_matrix[0].as_array().as_ptr());
         }
     }
+}
+
+trait Render {
+    fn render(&self);
 }
