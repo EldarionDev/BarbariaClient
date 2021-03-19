@@ -155,7 +155,6 @@ impl Model {
 
             /* Pass vertex data */
             /* Try vertices.as_ptr() */
-            println!("test: {}", num_vertices * 64);
             gl::BufferData(
                 gl::ARRAY_BUFFER,
                 (num_vertices * 8 * mem::size_of::<gl::types::GLfloat>() as u32)
