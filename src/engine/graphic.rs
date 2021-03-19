@@ -3,6 +3,9 @@ use std::{collections::HashMap, ffi::CString, fs};
 use glm::{Vec3, Vec4, Mat4};
 use serde_json::Value;
 
+
+extern crate freetype;
+
 mod animation;
 mod camera;
 mod model;
@@ -132,6 +135,11 @@ impl<'a> Graphic<'a> {
             );
         }
 
+        let mut font_library = match freetype::Library::init() {
+            Ok(i) => i,
+            Err(e) => panic!("Could not initialize the Font library!")
+        };
+
         for (_, x) in paths
             .resource_manager
             .get_assets("fonts")
@@ -140,7 +148,7 @@ impl<'a> Graphic<'a> {
         {
             fonts.insert(
                 split_string_first(&split_string_last(x, '/')[..], '.'),
-                font::Font::new(x.to_string()),
+                font::Font::new(&mut font_library, x.to_string()),
             );
         }
 
