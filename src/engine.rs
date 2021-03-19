@@ -20,7 +20,7 @@ mod window;
 pub struct Engine<'b> {
     paths: &'b Config,
     pub game_window: window::Window,
-    graphic: graphic::Graphic<'b>,
+    graphic: graphic::Graphic,
     pub event_handler: event::EventHandler
 }
 

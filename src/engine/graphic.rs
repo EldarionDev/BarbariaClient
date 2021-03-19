@@ -16,13 +16,20 @@ mod font;
 
 
 
-pub struct Graphic<'a> {
+pub struct Graphic {
     render_queue: Vec<Box<dyn Render>>,
     render_units: Vec<RenderUnit>,
-    render_texts: Vec<RenderText<'a>>
+    render_texts: Vec<RenderText>,
+    fonts: HashMap<String, font::Font>,
+    animations: HashMap<String, animation::Animation>,
+    cameras: HashMap<String, camera::Camera>,
+    models: HashMap<String, model::Model>,
+    projections: HashMap<String, projection::Projection>,
+    shaders: HashMap<String, shader::Shader>,
+    textures: HashMap<String, texture::Texture>,
 }
 
-impl<'a> Graphic<'a> {
+impl Graphic {
     pub fn new(paths: &Config) -> Self {
         let mut animations: HashMap<String, animation::Animation> = HashMap::new();
         let mut cameras: HashMap<String, camera::Camera> = HashMap::new();
@@ -146,9 +153,11 @@ impl<'a> Graphic<'a> {
             .iter()
             .enumerate()
         {
+            let mut val = font::Font::new(&mut font_library, x.to_string());
+            val.load();
             fonts.insert(
                 split_string_first(&split_string_last(x, '/')[..], '.'),
-                font::Font::new(&mut font_library, x.to_string()),
+                val
             );
         }
 
@@ -177,7 +186,14 @@ impl<'a> Graphic<'a> {
         Graphic {
             render_queue: Vec::new(),
             render_texts: Vec::new(),
-            render_units
+            render_units,
+            fonts,
+            animations,
+            cameras,
+            models,
+            projections,
+            shaders,
+            textures
         }
     }
 
@@ -204,8 +220,18 @@ impl<'a> Graphic<'a> {
 
     }
 
-    pub fn add_text(&mut self) {
-
+    pub fn add_text(&mut self, font: String, text: String, color: (f32, f32, f32), position: (f32, f32), scale: f32) {
+        let render_text = RenderText{
+            font: self.fonts.get(&font).expect("Could not load font.").clone(),
+            shader: self.shaders.get("2d_text").expect("Could not load shader").clone(),
+            text,
+            color,
+            position,
+            scale
+        };
+        
+        self.render_texts.push(render_text.clone());
+        self.render_queue.push(Box::new(render_text.clone()));
     }
 
     pub fn remove_text() {
@@ -251,14 +277,24 @@ impl Render for RenderUnit {
     }
 }
 
-pub struct RenderText<'a> {
-    font: &'a font::Font,
+#[derive(Clone)]
+pub struct RenderText {
+    font: font::Font,
+    shader: shader::Shader,
     text: String,
-    layout: RenderObject
+    color: (f32, f32, f32),
+    position: (f32, f32),
+    scale: (f32),
 }
 
-impl <'a> RenderText<'a> {
+impl RenderText{
 
+}
+
+impl Render for RenderText {
+    fn render(&self) {
+        self.font.render_text(glm::vec3(self.color.0, self.color.1, self.color.2), self.text.clone(), &self.shader, self.position, self.scale)
+    }
 }
 
 #[derive(Clone)]

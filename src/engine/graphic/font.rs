@@ -2,6 +2,7 @@ use std::{collections::HashMap, ffi::c_void, mem, thread::current};
 
 use freetype::ffi::{FT_LOAD_RENDER, FT_Renderer};
 
+#[derive(Clone)]
 pub struct Font {
     loaded: bool,
     font: freetype::Face,
@@ -10,6 +11,7 @@ pub struct Font {
     vbo: u32
 }
 
+#[derive(Clone)]
 struct Character {
     texture_id: u32,
     size: glm::Vec2,
@@ -101,7 +103,7 @@ impl Font {
         self.loaded = true;
     }
 
-    pub fn render_text(&mut self, color: glm::Vec3, text: String, shader: &super::shader::Shader, mut position: (f32, f32), scale: f32) {
+    pub fn render_text(&self, color: glm::Vec3, text: String, shader: &super::shader::Shader, mut position: (f32, f32), scale: f32) {
         unsafe {
             gl::Enable(gl::BLEND);
             gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
