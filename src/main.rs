@@ -42,9 +42,9 @@ fn main() {
     game.borrow_mut().load_world();
 
     game_engine.event_handler.register_event_object(game.clone());
-    game_engine.register_render_text("prince_valiant".to_string(), "testtesttesttesttesttest".to_string(), (0.9, 0.9, 0.9), (250.0, 250.0), 1.0);
+    //game_engine.register_render_text("prince_valiant".to_string(), "testtesttesttesttesttest".to_string(), (0.9, 0.9, 0.9), (250.0, 250.0), 1.0);
 
-    //game.borrow_mut().open_screen("main_menu", &mut game_engine);
+    game.borrow_mut().open_screen("main_menu", &mut game_engine);
 
     while !game.borrow().close {
         unsafe {

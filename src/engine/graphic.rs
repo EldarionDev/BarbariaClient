@@ -326,13 +326,14 @@ impl RenderObject {
     }
 
     fn calc_bind_model_matrix(&self, shader: &shader::Shader) {
-        let model_matrix = glm::mat4(
+         let model_matrix = glm::mat4(
             1.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0
-        );
+        ); 
         let model_matrix = glm::translate(&model_matrix, &self.position);
+        //let model_matrix = glm::translate(&self.position);
         let model_matrix = glm::scale(&model_matrix, &self.scale);
         //let model_matrix = glm::ext::rotate(&model_matrix, glm::builtin::radians(obj.rotation_angle), obj.rotation);
         
