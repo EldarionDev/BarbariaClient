@@ -4,6 +4,8 @@ mod engine;
 mod game;
 mod resource_manager;
 
+extern crate nalgebra_glm as glm;
+
 #[derive(Clone)]
 pub struct Config {
     resource_manager: resource_manager::ResourceManager,
@@ -40,12 +42,13 @@ fn main() {
     game.borrow_mut().load_world();
 
     game_engine.event_handler.register_event_object(game.clone());
+    game_engine.register_render_text("prince_valiant".to_string(), "testtesttesttesttesttest".to_string(), (0.9, 0.9, 0.9), (250.0, 250.0), 1.0);
 
-    game.borrow_mut().open_screen("main_menu", &mut game_engine);
+    //game.borrow_mut().open_screen("main_menu", &mut game_engine);
 
     while !game.borrow().close {
         unsafe {
-            gl::ClearColor(0.6, 0.3, 0.2, 1.0);
+            gl::ClearColor(0.5, 0.5, 0.5, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
 

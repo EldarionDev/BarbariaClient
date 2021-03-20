@@ -44,7 +44,7 @@ impl<'b> Engine<'b> {
                 &mut receiver,
                 &mut glfw
             ),
-            graphic: graphic::Graphic::new(paths),
+            graphic: graphic::Graphic::new(paths, (json_content["screenWidth"].as_u64().unwrap() as f32, json_content["screenHeight"].as_u64().unwrap() as f32)),
             event_handler: event::EventHandler::new(receiver.unwrap(), glfw.unwrap())
         }
     }
@@ -61,6 +61,10 @@ impl<'b> Engine<'b> {
 
     pub fn unregister_render_object() {
 
+    }
+
+    pub fn register_render_text(&mut self, font: String, text: String, color: (f32, f32, f32), position: (f32, f32), scale: f32) {
+        self.graphic.add_text(font, text, color, position, scale);
     }
 
     pub fn render_tick(&mut self) {

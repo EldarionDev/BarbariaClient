@@ -1,4 +1,4 @@
-use std::{collections::HashMap, ffi::c_void, mem, thread::current};
+use std::{collections::HashMap, ffi::{CString, c_void}, mem, thread::current};
 
 use freetype::ffi::{FT_LOAD_RENDER, FT_Renderer};
 
@@ -43,7 +43,7 @@ impl Font {
             gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
         }
 
-        let iterator = (0u8..128).map(|b| b as char as usize);
+        let iterator = (65u8..122).map(|b| b as char as usize);
         for i in iterator {
             match self.font.load_char(i, freetype::face::LoadFlag::RENDER) {
                 Ok(_) => {},
@@ -90,17 +90,20 @@ impl Font {
             gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
 
             gl::BufferData(gl::ARRAY_BUFFER, 
-                (mem::size_of::<gl::types::GLfloat>() as u32 * 6 * 4) as gl::types::GLsizeiptr,
+                (6 * 4 * mem::size_of::<gl::types::GLfloat>() as u32) as gl::types::GLsizeiptr,
                 std::ptr::null(), gl::DYNAMIC_DRAW);
-            gl::EnableVertexAttribArray(0);
             
+            //let stride = 4 * mem::size_of::<gl::types::GLfloat>() as gl::types::GLsizei;
             let stride = 4 * mem::size_of::<gl::types::GLfloat>() as gl::types::GLsizei;
             gl::VertexAttribPointer(0, 4, gl::FLOAT, gl::FALSE, stride, std::ptr::null());
+            gl::EnableVertexAttribArray(0);
             gl::BindBuffer(gl::ARRAY_BUFFER, 0);
             gl::BindVertexArray(0);
         }
 
         self.loaded = true;
+        self.vao = vao;
+        self.vbo = vbo;
     }
 
     pub fn render_text(&self, color: glm::Vec3, text: String, shader: &super::shader::Shader, mut position: (f32, f32), scale: f32) {
@@ -108,7 +111,11 @@ impl Font {
             gl::Enable(gl::BLEND);
             gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
         
-            let uniform_location = gl::GetUniformLocation(shader.get_id(), "text_color".as_bytes().as_ptr() as *const i8);
+            let uniform_name = CString::new("text_color").unwrap();
+            let uniform_location = gl::GetUniformLocation(shader.get_id(), uniform_name.as_bytes().as_ptr() as *const i8);
+            if uniform_location == -1 {
+                panic!("Uniform could not be found.");
+            }
             gl::Uniform3f(uniform_location, color.x, color.y, color.z);
 
             gl::ActiveTexture(gl::TEXTURE0);
@@ -137,9 +144,9 @@ impl Font {
                 gl::BindTexture(gl::TEXTURE_2D, current_char.texture_id);
 
                 gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
-                let size = mem::size_of::<f32>() as isize * 4 * 6;
-                gl::BufferSubData(gl::ARRAY_BUFFER, 0, size, (&vertices).as_ptr() as *const i32 as *const c_void);
-                gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+                let size = (6 * 4 * mem::size_of::<gl::types::GLfloat>() as u32) as gl::types::GLsizeiptr;
+                gl::BufferSubData(gl::ARRAY_BUFFER, 0, size, vertices.as_ptr() as *const f32 as *const c_void);
+                //gl::BindBuffer(gl::ARRAY_BUFFER, 0);
                 gl::DrawArrays(gl::TRIANGLES, 0, 6);
                 position.0 += ((current_char.advance >> 6) * scale as i64) as f32;
             }

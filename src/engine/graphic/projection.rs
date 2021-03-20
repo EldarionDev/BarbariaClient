@@ -10,7 +10,7 @@ pub struct Projection {
 }
 
 impl Projection {
-    pub fn new(path: &str) -> Projection {
+    pub fn new(path: &str, screen_size: (f32, f32)) -> Projection {
         let projection_file_content: String = fs::read_to_string(path).unwrap().parse().unwrap();
         let projection_file_content = &projection_file_content[..];
         let json_content: Value = serde_json::from_str(projection_file_content).unwrap();
@@ -18,24 +18,19 @@ impl Projection {
         if json_content["type"].as_str().unwrap() == "orthogonal" {
             let n = json_content["near_plane"].as_f64().unwrap() as f32;
             let f = json_content["far_plane"].as_f64().unwrap() as f32;
-            let r = 1.0;
-            let l = -1.0;
-            let t = 1.0;
-            let b = -1.0;
+            let r = screen_size.0;
+            let l = 0.0;
+            let t = screen_size.1;
+            let b = 0.0;
 
-            let orthogonal = glm::mat4(
-                2.0 / (r - l), 0.0, 0.0, -((r + l) / (r - l)),
-                0.0, 2.0 / (t - b), 0.0, - ((t + b) / (t - b)),
-                0.0, 0.0, -2.0 / (f - n), - ((f + n) / (f - n)),
-                0.0, 0.0, 0.0, 1.0
-            );
+            let orthogonal = glm::ortho(l, r, b, t, n, f);
 
             return Projection {
                 projection_matrix: orthogonal
             }
         } else if json_content["type"].as_str().unwrap() == "perspective" {
             return Projection {
-                projection_matrix: glm::ext::perspective(glm::builtin::radians(json_content["fov"].as_f64().unwrap() as f32), 1.0, json_content["near_plane"].as_f64().unwrap() as f32, json_content["far_plane"].as_f64().unwrap() as f32)
+                projection_matrix: glm::perspective(screen_size.0 / screen_size.1, json_content["fov"].as_f64().unwrap() as f32 * 0.01745329, json_content["near_plane"].as_f64().unwrap() as f32, json_content["far_plane"].as_f64().unwrap() as f32)
             }
         } else {
             panic!("Unknown projection in construction!");
@@ -49,7 +44,7 @@ impl Projection {
             if shader_location == -1 {
                 panic!("Shader location for projection matrix is not existing.");
             }
-            gl::UniformMatrix4fv(shader_location, 1, 0, self.projection_matrix[0].as_array().as_ptr());
+            gl::UniformMatrix4fv(shader_location, 1, 0, self.projection_matrix.as_ptr());
         }
     }
 }

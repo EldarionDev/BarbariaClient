@@ -30,7 +30,7 @@ pub struct Graphic {
 }
 
 impl Graphic {
-    pub fn new(paths: &Config) -> Self {
+    pub fn new(paths: &Config, screen_size: (f32, f32)) -> Self {
         let mut animations: HashMap<String, animation::Animation> = HashMap::new();
         let mut cameras: HashMap<String, camera::Camera> = HashMap::new();
         let mut models: HashMap<String, model::Model> = HashMap::new();
@@ -102,7 +102,7 @@ impl Graphic {
         {
             projections.insert(
                 split_string_first(&split_string_last(x, '/')[..], '.'),
-                projection::Projection::new(x),
+                projection::Projection::new(x, screen_size),
             );
         }
 
@@ -154,7 +154,6 @@ impl Graphic {
             .enumerate()
         {
             let mut val = font::Font::new(&mut font_library, x.to_string());
-            val.load();
             fonts.insert(
                 split_string_first(&split_string_last(x, '/')[..], '.'),
                 val
@@ -221,9 +220,15 @@ impl Graphic {
     }
 
     pub fn add_text(&mut self, font: String, text: String, color: (f32, f32, f32), position: (f32, f32), scale: f32) {
+        let mut shader = self.shaders.get("2d_text").expect("Could not load shader").clone();
+        shader.load();
+        let mut font = self.fonts.get(&font).expect("Could not load font.").clone();
+        font.load();
+        let projection = self.projections.get("2d_text").expect("COuld not load projection.").clone();
         let render_text = RenderText{
-            font: self.fonts.get(&font).expect("Could not load font.").clone(),
-            shader: self.shaders.get("2d_text").expect("Could not load shader").clone(),
+            font,
+            shader,
+            projection,
             text,
             color,
             position,
@@ -281,6 +286,7 @@ impl Render for RenderUnit {
 pub struct RenderText {
     font: font::Font,
     shader: shader::Shader,
+    projection: projection::Projection,
     text: String,
     color: (f32, f32, f32),
     position: (f32, f32),
@@ -293,6 +299,8 @@ impl RenderText{
 
 impl Render for RenderText {
     fn render(&self) {
+        self.shader.bind();
+        self.projection.bind(&self.shader);
         self.font.render_text(glm::vec3(self.color.0, self.color.1, self.color.2), self.text.clone(), &self.shader, self.position, self.scale)
     }
 }
@@ -324,8 +332,8 @@ impl RenderObject {
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0
         );
-        let model_matrix = glm::ext::translate(&model_matrix, self.position);
-        let model_matrix = glm::ext::scale(&model_matrix, self.scale);
+        let model_matrix = glm::translate(&model_matrix, &self.position);
+        let model_matrix = glm::scale(&model_matrix, &self.scale);
         //let model_matrix = glm::ext::rotate(&model_matrix, glm::builtin::radians(obj.rotation_angle), obj.rotation);
         
         let string = CString::new("model_matrix").unwrap();
@@ -334,7 +342,7 @@ impl RenderObject {
             if shader_location == -1 {
                 panic!("Shader location for projection matrix is not existing.");
             }
-            gl::UniformMatrix4fv(shader_location, 1, 0, model_matrix[0].as_array().as_ptr());
+            gl::UniformMatrix4fv(shader_location, 1, 0, model_matrix.as_ptr());
         }
     }
 }
