@@ -5,6 +5,31 @@
     "background":"map",
     "text_elements":[],
     "texture_elements": [
-        {"position":[42.0,18.5],"size":[1864.0,954.0],"name":"faction_selection_overlay","event_codes":[""],"gui":"None"}
+        {"position":[42.0,18.5],"size":[1864.0,954.0],"name":"faction_selection_overlay","event_codes":[""],"gui":"None"},
+        {"position":[900.0,295.0],"size":[50.0,50.0],"name":"harad_faction_button","event_codes":[""],"gui":"None"},
+        {"position":[760.0,245.0],"size":[50.0,50.0],"name":"umbar_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[750.0,410.0],"size":[50.0,50.0],"name":"dol_amroth_faction_button","event_codes":[""],"gui":"None"},
+        {"position":[850.0,450.0],"size":[50.0,50.0],"name":"gondor_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[980.0,460.0],"size":[50.0,50.0],"name":"mordor_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[1150.0,440.0],"size":[50.0,50.0],"name":"khand_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[1160.0,590.0],"size":[50.0,50.0],"name":"rhun_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[1010.0,615.0],"size":[50.0,50.0],"name":"dorwinion_faction_button","event_codes":[""],"gui":"None"},
+        {"position":[925.0,805.0],"size":[50.0,50.0],"name":"erebor_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[930.0,750.0],"size":[50.0,50.0],"name":"dale_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[850.0,770.0],"size":[50.0,50.0],"name":"mirkwood_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[720.0,530.0],"size":[50.0,50.0],"name":"rohan_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[740.0,640.0],"size":[50.0,50.0],"name":"lothlorien_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[780.0,690.0],"size":[50.0,50.0],"name":"shire_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[630.0,550.0],"size":[50.0,50.0],"name":"isengard_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[680.0,650.0],"size":[50.0,50.0],"name":"khazad_dum_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[710.0,715.0],"size":[50.0,50.0],"name":"imladris_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[720.0,770.0],"size":[50.0,50.0],"name":"misty_mountains_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[660.0,760.0],"size":[50.0,50.0],"name":"rhudaur_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[675.0,825.0],"size":[50.0,50.0],"name":"angmar_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[560.0,680.0],"size":[50.0,50.0],"name":"cardolan_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[590.0,610.0],"size":[50.0,50.0],"name":"dunland_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[480.0,545.0],"size":[50.0,50.0],"name":"numenor_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[370.0,715.0],"size":[50.0,50.0],"name":"lindon_faction_button","event_codes":[""],"gui":"None"}, 
+        {"position":[520.0,760.0],"size":[50.0,50.0],"name":"arthedain_faction_button","event_codes":[""],"gui":"None"}
     ]
 }
