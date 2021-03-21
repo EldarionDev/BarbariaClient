@@ -82,8 +82,9 @@ impl Game {
         }
     }
 
-    pub fn game_tick(&mut self) {
-        for s in &self.listener.event_codes[..] {
+    pub fn game_tick(&mut self, engine: &mut engine::Engine) {
+        let event_codes = self.listener.event_codes.clone();
+        for s in &event_codes[..] {
             if s == "" {
                 continue;
             }
@@ -96,8 +97,13 @@ impl Game {
             if s == "close" {
                 match self.screens.last() {
                     Some(i) => i,
-                    None => panic!("Critical error occurred")
+                    None => panic!("Critical error occurred!")
                 }.close();
+            }
+
+            if s.starts_with("open") {
+                let split_string = s.split(" ");
+                self.open_screen(split_string.last().expect("No screen to open specified"), engine);
             }
 
             match &mut self.map {
@@ -110,6 +116,7 @@ impl Game {
                 None => continue
             }.retreive_event_code(&s[..]);
         }
+        self.listener.event_codes.clear();
     }
 
     pub fn save_world(&self) {

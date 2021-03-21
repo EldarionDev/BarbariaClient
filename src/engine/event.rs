@@ -5,7 +5,8 @@ pub struct EventHandler {
     glfw_instance: glfw::Glfw,
     event_functions: Vec<fn()>,
     event_objects: Vec<Rc<RefCell<dyn Listener>>>,
-    current_cursor_pos: (f64, f64)
+    current_cursor_pos: (f64, f64),
+    mouse_clicked: bool
 }
 
 impl EventHandler {
@@ -15,7 +16,8 @@ impl EventHandler {
             glfw_instance,
             event_functions: Vec::new(),
             event_objects: Vec::new(),
-            current_cursor_pos: (0.0, 0.0)
+            current_cursor_pos: (0.0, 0.0),
+            mouse_clicked: false
         }
     }
 
@@ -38,7 +40,13 @@ impl EventHandler {
                     }
                 }
 
-                glfw::WindowEvent::MouseButton(_, _, _) => {
+                glfw::WindowEvent::MouseButton(_, a, _) => {
+                    match a {
+                        glfw::Action::Press => {if self.mouse_clicked == true {continue;} else {self.mouse_clicked = true}},
+                        glfw::Action::Release => {self.mouse_clicked = false; continue;},
+                        glfw::Action::Repeat => {continue;}
+                    }
+
                     for o in self.event_objects.iter() {
                         o.borrow_mut().mouse_clicked(self.current_cursor_pos);
                     }

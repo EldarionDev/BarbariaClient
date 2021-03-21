@@ -1,0 +1,10 @@
+{
+    "name":"faction_selection",
+    "position":[0.0,0.0],
+    "scale":[1000.0,1000.0],
+    "background":"map",
+    "text_elements":[],
+    "texture_elements": [
+        {"position":[0.0,0.0],"size":[1000.0,1000.0],"name":"faction_selection_overlay","event_codes":[""],"gui":"None"}
+    ]
+}

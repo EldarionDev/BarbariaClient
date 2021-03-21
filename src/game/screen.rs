@@ -66,12 +66,11 @@ impl Screen {
 
                     if element_x < x && x < element_x_end {
                         if element_y < y && y < element_y_end {
-                            for e in &element.event_codes {
+                            for e in element.event_codes.iter() {
                                 if e == "" {
                                     continue;
                                 }
                                 listener.event_codes.push(e.to_string());
-                                return;
                             }
                         }
                     }

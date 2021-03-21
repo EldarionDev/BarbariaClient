@@ -11,5 +11,5 @@
             {"position":[22.0,275.0],"size":[75.0,75.0],"name":"exit_button", "event_codes":["exit"],"gui":"None"},
                 {"position":[22.0,400.0],"size":[75.0,75.0],"name":"settings_button","event_codes":[""],"gui":"None"},
                     {"position":[22.0,525.0],"size":[75.0,75.0],"name":"multi_player_button","event_codes":[""],"gui":"None"},
-                        {"position" :[22.0,650.0],"size":[75.0,75.0],"name":"single_player_button","event_codes":[""],"gui":"None"}]
+                        {"position" :[22.0,650.0],"size":[75.0,75.0],"name":"single_player_button","event_codes":["close", "open faction_selection"],"gui":"None"}]
 }

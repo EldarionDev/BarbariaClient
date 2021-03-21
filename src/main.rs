@@ -1,4 +1,4 @@
-use std::{cell::{RefCell, RefMut}, rc::Rc};
+use std::{cell::{RefCell, RefMut}, rc::Rc, time::{Instant, SystemTime}};
 
 mod engine;
 mod game;
@@ -22,6 +22,8 @@ fn main() {
     let asset_path: &str = "assets/";
     let config_path: &str = "config/";
     let data_path: &str = "data/";
+    
+    let mut start = Instant::now();
 
     let mut program_config = Config {
         resource_manager: resource_manager::ResourceManager::new(
@@ -47,13 +49,19 @@ fn main() {
     game.borrow_mut().open_screen("main_menu", &mut game_engine);
 
     while !game.borrow().close {
+        let elapsed = start.elapsed().as_millis();
+        if elapsed < 16 {
+            continue;
+        }
+        start = Instant::now();
+
         unsafe {
             gl::ClearColor(0.5, 0.5, 0.5, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
 
         game_engine.render_tick();
-        game.borrow_mut().game_tick();
+        game.borrow_mut().game_tick(&mut game_engine);
     }
 
     game.borrow().save_world();
