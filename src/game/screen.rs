@@ -26,6 +26,10 @@ impl Screen {
             gui.add_element(engine, &e.name[..], e.position, e.size);
         }
 
+        for e in &self.text_elements {
+            gui.add_text(engine, e.position, e.fontsize, &e.font[..], &e.text[..], e.color);
+        }
+
         self.gui = Some(gui);
     }
 
@@ -42,6 +46,7 @@ impl Screen {
     }
 
     pub fn mouse_clicked(&self, listener: &mut Listener, cursor_pos: (f64, f64), screen_size: (f32, f32)) {
+        /* TODO: Fix calculation to new orthogonal matrix */
         let cursor_pos = (cursor_pos.0 as f32, cursor_pos.1 as f32);
         let x = (1000.0 / screen_size.0) * cursor_pos.0;
         let y = (1000.0 / screen_size.1) * (screen_size.1 - cursor_pos.1); 
@@ -80,7 +85,8 @@ impl Screen {
 pub struct TextElement {
     event_name: String,
     position: (f32, f32),
-    fontsize: (f32, f32),
+    color: (f32, f32, f32),
+    fontsize: f32,
     font: String,
     text: String
 }

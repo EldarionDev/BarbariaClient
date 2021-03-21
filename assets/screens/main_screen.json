@@ -3,7 +3,9 @@
     "position":[0.0,0.0],
     "scale":[1000.0,1000.0],
     "background":"background_mines",
-    "text_elements":[],
+    "text_elements":[
+        {"event_name": "testtext", "position":[400.0,400.0], "color":[0.7,0.7,0.7], "fontsize":1.0, "font":"prince_valiant", "text":"Testtesttest"}
+    ],
     "texture_elements":[
         {"position":[0.0,175.0],"size":[100.0,650.0],"name":"main_menu","event_codes":[""],"gui":"None"},
             {"position":[22.0,275.0],"size":[75.0,75.0],"name":"exit_button", "event_codes":["exit"],"gui":"None"},
