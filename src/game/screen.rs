@@ -25,7 +25,7 @@ impl Screen {
         }
 
         for e in &self.texture_elements {
-            gui.add_element(engine, &e.name[..], e.position, e.size);
+            gui.add_element(engine, &e.name[..], e.position, e.size, e.align_to_screen);
         }
 
         for e in &self.text_elements {
@@ -45,6 +45,18 @@ impl Screen {
 
     pub fn window_closed(&self) {
 
+    }
+
+    pub fn render_event_texture(&mut self, engine: &mut engine::Engine, element_name: &str) {
+        let index: usize = element_name.parse().expect("Not a valid index");
+        let texture_element = self.event_texture_elements.get(index).unwrap();
+        self.gui.as_mut().unwrap().add_element(engine, &texture_element.name, texture_element.position, texture_element.size, texture_element.align_to_screen)
+    }
+
+    pub fn render_event_text(&mut self, engine: &mut engine::Engine, element_name: &str) {
+        let index: usize = element_name.parse().expect("Not a valid index");
+        let text_element = self.event_text_elements.get(index).unwrap();
+        self.gui.as_mut().unwrap().add_text(engine, text_element.position, text_element.fontsize, &text_element.font, &text_element.text, text_element.color);
     }
 
     pub fn mouse_clicked(&self, listener: &mut Listener, cursor_pos: (f64, f64), screen_size: (f32, f32)) {
@@ -89,7 +101,8 @@ pub struct TextElement {
     color: (f32, f32, f32),
     fontsize: f32,
     font: String,
-    text: String
+    text: String,
+    align_to_screen: bool
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -97,5 +110,6 @@ pub struct TextureElement {
     position: (f32, f32),
     size: (f32, f32),
     name: String,
-    pub event_codes: Vec<String>
+    pub event_codes: Vec<String>,
+    align_to_screen: bool
 }

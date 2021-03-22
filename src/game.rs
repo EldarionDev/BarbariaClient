@@ -106,6 +106,18 @@ impl Game {
                 self.open_screen(split_string.last().expect("No screen to open specified"), engine);
             }
 
+            if s.starts_with("render") {
+                let mut split_string = s.split(" ");
+                match split_string.find(|&x| x == "texture") {
+                    Some(_) => {self.screens.last_mut().unwrap().render_event_texture(engine, split_string.last().unwrap()); continue;},
+                    None => {}
+                };
+                match split_string.find(|&x| x == "text") {
+                    Some(_) => {self.screens.last_mut().unwrap().render_event_text(engine, split_string.last().unwrap()); continue;},
+                    None => panic!("Neither texture nor text specified")
+                }
+            }
+
             match &mut self.map {
                 Some(i) => i,
                 None => continue
