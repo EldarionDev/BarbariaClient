@@ -31,5 +31,9 @@
         {"position":[480.0,545.0],"size":[50.0,50.0],"name":"numenor_faction_button","event_codes":[""],"gui":"None"}, 
         {"position":[370.0,715.0],"size":[50.0,50.0],"name":"lindon_faction_button","event_codes":[""],"gui":"None"}, 
         {"position":[520.0,760.0],"size":[50.0,50.0],"name":"arthedain_faction_button","event_codes":[""],"gui":"None"}
+    ],
+    "event_text_elements":[],
+    "event_texture_elements":[
+        
     ]
 }

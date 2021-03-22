@@ -11,6 +11,8 @@ pub struct Screen {
     background: String,
     text_elements: Vec<TextElement>,
     texture_elements: Vec<TextureElement>,
+    event_text_elements: Vec<TextElement>,
+    event_texture_elements: Vec<TextureElement>,
     gui: Option<gui::Gui>
 }
 
