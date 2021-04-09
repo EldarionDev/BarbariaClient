@@ -7,13 +7,15 @@ use serde::{Deserialize, Serialize};
 pub struct Gui {
     pub size: (f32, f32),
     pub position: (f32, f32),
+    adjust_to_screen: bool
 }
 
 impl Gui {
-    pub fn new(size: (f32, f32), position: (f32, f32)) -> Gui{
+    pub fn new(size: (f32, f32), position: (f32, f32), adjust_to_screen: bool) -> Gui{
         Gui {
             size,
             position,
+            adjust_to_screen
         }
     }
 
@@ -27,26 +29,44 @@ impl Gui {
         glm::vec3(0.0, 0.0, 0.0), 0.0, glm::vec3(size.0, size.1, 1.0));
     }
 
-    pub fn add_element(&mut self, engine: &mut engine::Engine, element_name: &str, position: (f32, f32), size: (f32, f32), screen_align: bool) {
+    pub fn add_element(&mut self, engine: &mut engine::Engine, element_name: &str, position: (f32, f32), size: (f32, f32)) {
         let aspect_x = engine.game_window.size_x as f32 / 1000.0;
         let aspect_y = engine.game_window.size_y as f32 / 1000.0;
 
-        let pos_x = (self.size.0 / (1000.0 / position.0)) * aspect_x;
-        let pos_y = (self.size.1 / (1000.0 / position.1)) *  aspect_y;
-
-        let mut size_x = self.size.0 / (1000.0 / size.0);
-        let mut size_y = self.size.1 / (1000.0 / size.1); 
+        /* self.size.0 / 1000.0 is a factor how often the GUI size fits into the screen size. */
+        let pos_x: f32;
+        let pos_y: f32;
+        if self.adjust_to_screen {
+            pos_x = ((self.size.0 / 1000.0) * position.0  - 500.0) * aspect_x;
+            pos_y = ((self.size.1 / 1000.0) * position.1 - 500.0) * aspect_y;
+        } else {
+            pos_x = (self.size.0 / 1000.0) * position.0  - 500.0;
+            pos_y = (self.size.1 / 1000.0) * position.1 - 500.0;
+        }
         
-        if screen_align == true {
-            size_x = (self.size.0 / (1000.0 / size.0)) * aspect_x;
-            size_y = (self.size.1 / (1000.0 / size.1)) * aspect_y;
-        } 
+
+        let size_x = (self.size.0 / 1000.0) * size.0;
+        let size_y = (self.size.1 / 1000.0) * size.1; 
         
         engine.register_render_object(element_name.to_string(), glm::vec3(pos_x, pos_y, 0.0), 
         glm::vec3(0.0, 0.0, 0.0), 0.0, glm::vec3(size_x, size_y, 1.0));
     }
 
     pub fn add_text(&mut self, engine: &mut engine::Engine, position: (f32, f32), font_size: f32, font_name: &str, text: &str, color: (f32, f32, f32)) {
-        engine.register_render_text(font_name.to_string(), text.to_string(), color, position, font_size);
+        let aspect_x = engine.game_window.size_x as f32 / 1000.0;
+        let aspect_y = engine.game_window.size_y as f32 / 1000.0;
+
+        /* self.size.0 / 1000.0 is a factor how often the GUI size fits into the screen size. */
+        let pos_x: f32;
+        let pos_y: f32;
+        if self.adjust_to_screen {
+            pos_x = ((self.size.0 / 1000.0) * position.0  - 500.0) * aspect_x;
+            pos_y = ((self.size.1 / 1000.0) * position.1 - 500.0) * aspect_y;
+        } else {
+            pos_x = (self.size.0 / 1000.0) * position.0  - 500.0;
+            pos_y = (self.size.1 / 1000.0) * position.1 - 500.0;
+        }
+        
+        engine.register_render_text(font_name.to_string(), text.to_string(), color, (pos_x, pos_y), font_size);
     }
 }

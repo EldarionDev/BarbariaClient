@@ -3,13 +3,16 @@
     "position":[0.0,0.0],
     "scale":[1000.0,1000.0],
     "background":"background_mines",
-    "text_elements":[],
+    "adjust_to_screen":true,
+    "text_elements":[
+        {"position":[900.0,50.0],"color":[1.0,1.0,1.0],"fontsize":1.0,"font":"prince_valiant","text":"Madeby"}
+    ],
     "texture_elements":[
-        {"position":[0.0,175.0],"size":[100.0,650.0],"name":"main_menu","event_codes":[""],"gui":"None","align_to_screen":false},
-        {"position":[22.0,275.0],"size":[75.0,75.0],"name":"exit_button", "event_codes":["exit"],"gui":"None","align_to_screen":false},
-        {"position":[22.0,400.0],"size":[75.0,75.0],"name":"settings_button","event_codes":[""],"gui":"None","align_to_screen":false},
-        {"position":[22.0,525.0],"size":[75.0,75.0],"name":"multi_player_button","event_codes":[""],"gui":"None","align_to_screen":false},
-        {"position" :[22.0,650.0],"size":[75.0,75.0],"name":"single_player_button","event_codes":["close", "open faction_selection"],"gui":"None","align_to_screen":false}
+        {"position":[19.0,500.0],"size":[75.0,650.0],"name":"main_menu","event_codes":[""],"gui":"None"},
+        {"position":[35.0,325.0],"size":[75.0,75.0],"name":"exit_button", "event_codes":["exit"],"gui":"None"},
+        {"position":[35.0,441.0],"size":[75.0,75.0],"name":"settings_button","event_codes":[""],"gui":"None"},
+        {"position":[35.0,557.0],"size":[75.0,75.0],"name":"multi_player_button","event_codes":[""],"gui":"None"},
+        {"position" :[35.0,675.0],"size":[75.0,75.0],"name":"single_player_button","event_codes":["close", "open faction_selection"],"gui":"None"}
     ],
     "event_text_elements":[],
     "event_texture_elements":[]

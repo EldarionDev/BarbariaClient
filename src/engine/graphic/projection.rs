@@ -18,10 +18,10 @@ impl Projection {
         if json_content["type"].as_str().unwrap() == "orthogonal" {
             let n = json_content["near_plane"].as_f64().unwrap() as f32;
             let f = json_content["far_plane"].as_f64().unwrap() as f32;
-            let r = screen_size.0;
-            let l = 0.0;
-            let t = screen_size.1;
-            let b = 0.0;
+            let r = screen_size.0 / 2.0;
+            let l = -(screen_size.0 / 2.0);
+            let t = screen_size.1 / 2.0;
+            let b = -(screen_size.1 / 2.0);
 
             let orthogonal = glm::ortho(l, r, b, t, n, f);
 

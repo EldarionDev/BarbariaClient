@@ -9,6 +9,7 @@ pub struct Screen {
     position: (f32, f32),
     scale: (f32, f32),
     background: String,
+    adjust_to_screen: bool,
     text_elements: Vec<TextElement>,
     texture_elements: Vec<TextureElement>,
     event_text_elements: Vec<TextElement>,
@@ -18,14 +19,14 @@ pub struct Screen {
 
 impl Screen {
     pub fn open(&mut self, engine: &mut engine::Engine) {
-        let mut gui = gui::Gui::new(self.scale, self.position);
+        let mut gui = gui::Gui::new(self.scale, self.position, self.adjust_to_screen);
         
         if self.background != "" {
             gui.add_background(engine, &self.background[..], (0.0, 0.0),(1000.0, 1000.0));
         }
 
         for e in &self.texture_elements {
-            gui.add_element(engine, &e.name[..], e.position, e.size, e.align_to_screen);
+            gui.add_element(engine, &e.name[..], e.position, e.size);
         }
 
         for e in &self.text_elements {
@@ -50,7 +51,7 @@ impl Screen {
     pub fn render_event_texture(&mut self, engine: &mut engine::Engine, element_name: &str) {
         let index: usize = element_name.parse().expect("Not a valid index");
         let texture_element = self.event_texture_elements.get(index).unwrap();
-        self.gui.as_mut().unwrap().add_element(engine, &texture_element.name, texture_element.position, texture_element.size, texture_element.align_to_screen)
+        self.gui.as_mut().unwrap().add_element(engine, &texture_element.name, texture_element.position, texture_element.size)
     }
 
     pub fn render_event_text(&mut self, engine: &mut engine::Engine, element_name: &str) {
@@ -61,48 +62,34 @@ impl Screen {
 
     pub fn mouse_clicked(&self, listener: &mut Listener, cursor_pos: (f64, f64), screen_size: (f32, f32)) {
         /* TODO: Fix calculation to new orthogonal matrix */
-        let cursor_pos = (cursor_pos.0 as f32, cursor_pos.1 as f32);
-        let x = (1000.0 / screen_size.0) * cursor_pos.0;
-        let y = (1000.0 / screen_size.1) * (screen_size.1 - cursor_pos.1); 
+        let cursor_pos = (cursor_pos.0 as f32, screen_size.1 - cursor_pos.1 as f32);
         let gui_position = self.gui.clone().unwrap().position.clone();
         let gui_size = self.gui.clone().unwrap().size.clone();
 
-        if self.position.0 < x && x < ((self.position.0 + self.scale.0)) {
-            if self.position.1 < y && y < ((self.position.1 + self.scale.1)) {
-                let x = (x - gui_position.0) *  (gui_size.0 / 1000.0) + gui_position.0;
-                let y = (y - gui_position.1) *  (gui_size.1 / 1000.0) + gui_position.1;
 
-                for element in (&self.texture_elements).iter().rev() {
-                    let element_x = (element.position.0 - gui_position.0) *  (gui_size.0 / 1000.0) + gui_position.0;
-                    let element_x_end = (element.position.0 - gui_position.0) *  (gui_size.0 / 1000.0) + gui_position.0 + (element.size.0 * (gui_size.0 / 1000.0));
-                    let element_y = (element.position.1 - gui_position.1) *  (gui_size.1 / 1000.0) + gui_position.1;
-                    let element_y_end = (element.position.1 - gui_position.1) *  (gui_size.1 / 1000.0) + gui_position.1 + (element.size.1 * (gui_size.1 / 1000.0));
-
-                    if element_x < x && x < element_x_end {
-                        if element_y < y && y < element_y_end {
-                            for e in element.event_codes.iter() {
-                                if e == "" {
-                                    continue;
-                                }
-                                listener.event_codes.push(e.to_string());
-                            }
-                        }
-                    }
-                }
-            }
+        /* Check if mouse-click is within screen */
+        let x = (1000.0 / screen_size.0) * cursor_pos.0;
+        let y = (1000.0 / screen_size.1) * cursor_pos.1;
+        if self.position.0 > x || x > (self.position.0 + self.scale.0) || self.position.1 > y || y > (self.position.1 + self.scale.1) {
+            return;
+        }
+        
+        
+        for element in (&self.texture_elements).iter().rev() {
+            let mut x = 0;
+            let mut y = 0;
+            
         }
     }
 }
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct TextElement {
-    event_name: String,
     position: (f32, f32),
     color: (f32, f32, f32),
     fontsize: f32,
     font: String,
-    text: String,
-    align_to_screen: bool
+    text: String
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -110,6 +97,5 @@ pub struct TextureElement {
     position: (f32, f32),
     size: (f32, f32),
     name: String,
-    pub event_codes: Vec<String>,
-    align_to_screen: bool
+    pub event_codes: Vec<String>
 }
