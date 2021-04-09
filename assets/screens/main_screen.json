@@ -5,7 +5,7 @@
     "background":"background_mines",
     "adjust_to_screen":true,
     "text_elements":[
-        {"position":[25.0,50.0],"color":[1.0,1.0,1.0],"fontsize":1.0,"font":"prince_valiant","text":"Made by WK, Kuro, Whitey, Synn, Stewie, Stefan, Coma, Carondol, PeaMan, Behelit, Dreezy"}
+        {"position":[25.0,50.0],"color":[1.0,1.0,1.0],"fontsize":1.0,"font":"prince_valiant","text":"credits"}
     ],
     "texture_elements":[
         {"position":[19.0,500.0],"size":[75.0,650.0],"name":"main_menu","event_codes":[""],"gui":"None"},

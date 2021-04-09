@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::engine::{self, game_object::gui};
+use crate::{Config, engine::{self, game_object::gui}};
 
 use super::listener::{self, Listener};
 
@@ -18,7 +18,7 @@ pub struct Screen {
 }
 
 impl Screen {
-    pub fn open(&mut self, engine: &mut engine::Engine) {
+    pub fn open(&mut self, engine: &mut engine::Engine, paths: Config) {
         let mut gui = gui::Gui::new(self.scale, self.position, self.adjust_to_screen);
         
         if self.background != "" {
@@ -30,7 +30,15 @@ impl Screen {
         }
 
         for e in &self.text_elements {
-            gui.add_text(engine, e.position, e.fontsize, &e.font[..], &e.text[..], e.color);
+            for i in paths.resource_manager.get_assets("texts") {
+                let name = i.split('/').last().unwrap().to_string();
+                let name = name.split('.').next().unwrap();
+                if name == e.text {
+                    let file_c = std::fs::read_to_string(i).expect("Could not read text file.");
+                    gui.add_text(engine, e.position, e.fontsize, &e.font[..], &file_c, e.color);
+                    break;
+                }
+            }
         }
 
         self.gui = Some(gui);

@@ -60,7 +60,7 @@ impl Game {
     pub fn open_screen(&mut self, name: &str, engine: &mut engine::Engine) {
         for s in &mut self.screens {
             if s.name == name {
-                s.open(engine);
+                s.open(engine, self.paths.clone());
                 self.open_screens.push((*s).clone());
             }
         }
