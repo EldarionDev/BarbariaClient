@@ -43,7 +43,7 @@ impl Font {
             gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
         }
 
-        let iterator = (65u8..122).map(|b| b as char as usize);
+        let iterator = (33u8..126).map(|b| b as char as usize);
         for i in iterator {
             match self.font.load_char(i, freetype::face::LoadFlag::RENDER) {
                 Ok(_) => {},
@@ -122,6 +122,15 @@ impl Font {
             gl::BindVertexArray(self.vao);
 
             for c in text.chars() {
+                if c as u8 == 32 {
+                    let n_char = match self.font_cache.get(&'n') {
+                        Some(i) => i,
+                        None => panic!("N not present in character map!")
+                    };
+                    position.0 += ((n_char.advance >> 6) * scale as i64) as f32;
+                    continue;
+                }
+
                 let current_char = match self.font_cache.get(&c) {
                     Some(i) => i,
                     None => panic!("Could not find char in character map.")
