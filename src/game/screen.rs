@@ -81,10 +81,10 @@ impl Screen {
         if cursor_pos.0 >= self.position.0 && cursor_pos.0 <= self.position.0 + self.scale.0 && cursor_pos.1 >= self.position.1 && cursor_pos.1 <= self.position.1 + self.scale.1 {
             
             for element in (&self.texture_elements).iter().rev() {
-                let element_x = element.position.0 * (self.scale.0 / 1000.0) + self.position.0 - element.size.0 * (self.scale.0 / 1000.0);
-                let element_x_end = element_x + (element.size.0 * (self.scale.0 / 1000.0)) * 2.0;
-                let element_y = element.position.1 * (self.scale.1 / 1000.0) + self.position.1 - element.size.1 * (self.scale.1 / 1000.0);
-                let element_y_end = element_y + (element.size.1 * (self.scale.1 / 1000.0)) * 2.0;
+                let element_x = element.position.0 * (self.scale.0 / 1000.0) + self.position.0 - (element.size.0 * (self.scale.0 / 1000.0)) / 2.0;
+                let element_x_end = element_x + (element.size.0 * (self.scale.0 / 1000.0));
+                let element_y = element.position.1 * (self.scale.1 / 1000.0) + self.position.1 - (element.size.1 * (self.scale.1 / 1000.0)) / 2.0;
+                let element_y_end = element_y + (element.size.1 * (self.scale.1 / 1000.0));
 
                 if element_x < cursor_pos.0 && cursor_pos.0 < element_x_end {
                     if element_y < cursor_pos.1 && cursor_pos.1 < element_y_end {
