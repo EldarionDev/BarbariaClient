@@ -121,13 +121,20 @@ impl Font {
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindVertexArray(self.vao);
 
+            let position_origin = position;
+
             for c in text.chars() {
-                if c as u8 == 32 {
+                if c  == ' ' {
                     let n_char = match self.font_cache.get(&'n') {
                         Some(i) => i,
                         None => panic!("N not present in character map!")
                     };
-                    position.0 += ((n_char.advance >> 6) * scale as i64) as f32;
+                    position.0 += ((n_char.advance >> 6) as f32 * scale) as f32;
+                    continue;
+                } else if c == '\n' {
+                    /* 50 is default value for font size 1 */
+                    position.1 -= 50.0 * scale;
+                    position.0 = position_origin.0;
                     continue;
                 }
 
@@ -157,7 +164,7 @@ impl Font {
                 gl::BufferSubData(gl::ARRAY_BUFFER, 0, size, vertices.as_ptr() as *const f32 as *const c_void);
                 //gl::BindBuffer(gl::ARRAY_BUFFER, 0);
                 gl::DrawArrays(gl::TRIANGLES, 0, 6);
-                position.0 += ((current_char.advance >> 6) * scale as i64) as f32;
+                position.0 += ((current_char.advance >> 6) as f32 * scale) as f32;
             }
 
             gl::BindVertexArray(0);
