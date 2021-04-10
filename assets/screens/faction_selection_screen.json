@@ -3,10 +3,9 @@
     "position":[0.0,0.0],
     "scale":[1000.0,1000.0],
     "background":"map",
-    "adjust_to_screen":true,
     "text_elements":[],
     "texture_elements": [
-        {"position":[21.0,18.5],"size":[932.0,954.0],"name":"faction_selection_overlay","event_codes":[""],"gui":"None"},
+        {"position":[487.0,495.5],"size":[1770.8,1030.3],"name":"faction_selection_overlay","event_codes":[""],"gui":"None"},
         {"position":[450.0,295.0],"size":[50.0,50.0],"name":"harad_faction_button","event_codes":["render texture 0"],"gui":"None"},
         {"position":[380.0,245.0],"size":[50.0,50.0],"name":"umbar_faction_button","event_codes":["render texture 1"],"gui":"None"}, 
         {"position":[375.0,410.0],"size":[50.0,50.0],"name":"dol_amroth_faction_button","event_codes":["render texture 2"],"gui":"None"},

@@ -3,7 +3,6 @@
     "position":[0.0,0.0],
     "scale":[1000.0,1000.0],
     "background":"background_mines",
-    "adjust_to_screen":true,
     "text_elements":[
         {"position":[25.0,50.0],"color":[1.0,1.0,1.0],"fontsize":0.5,"font":"prince_valiant","text":"credits"}
     ],
