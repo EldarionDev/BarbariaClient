@@ -7,15 +7,13 @@ use serde::{Deserialize, Serialize};
 pub struct Gui {
     pub size: (f32, f32),
     pub position: (f32, f32),
-    adjust_to_screen: bool
 }
 
 impl Gui {
-    pub fn new(size: (f32, f32), position: (f32, f32), adjust_to_screen: bool) -> Gui{
+    pub fn new(size: (f32, f32), position: (f32, f32)) -> Gui{
         Gui {
             size,
-            position,
-            adjust_to_screen
+            position
         }
     }
 
@@ -34,16 +32,8 @@ impl Gui {
         let aspect_y = engine.game_window.size_y as f32 / 1000.0;
 
         /* self.size.0 / 1000.0 is a factor how often the GUI size fits into the screen size. */
-        let pos_x: f32;
-        let pos_y: f32;
-        if self.adjust_to_screen {
-            pos_x = ((self.size.0 / 1000.0) * position.0  - 500.0) * aspect_x;
-            pos_y = ((self.size.1 / 1000.0) * position.1 - 500.0) * aspect_y;
-        } else {
-            pos_x = (self.size.0 / 1000.0) * position.0  - 500.0;
-            pos_y = (self.size.1 / 1000.0) * position.1 - 500.0;
-        }
-        
+        let pos_x = ((self.size.0 / 1000.0) * position.0  - 500.0) * aspect_x;
+        let pos_y = ((self.size.1 / 1000.0) * position.1 - 500.0) * aspect_y;
 
         let size_x = (self.size.0 / 1000.0) * size.0;
         let size_y = (self.size.1 / 1000.0) * size.1; 
@@ -57,15 +47,8 @@ impl Gui {
         let aspect_y = engine.game_window.size_y as f32 / 1000.0;
 
         /* self.size.0 / 1000.0 is a factor how often the GUI size fits into the screen size. */
-        let pos_x: f32;
-        let pos_y: f32;
-        if self.adjust_to_screen {
-            pos_x = ((self.size.0 / 1000.0) * position.0  - 500.0) * aspect_x;
-            pos_y = ((self.size.1 / 1000.0) * position.1 - 500.0) * aspect_y;
-        } else {
-            pos_x = (self.size.0 / 1000.0) * position.0  - 500.0;
-            pos_y = (self.size.1 / 1000.0) * position.1 - 500.0;
-        }
+        let pos_x = ((self.size.0 / 1000.0) * position.0  - 500.0) * aspect_x;
+        let pos_y = ((self.size.1 / 1000.0) * position.1 - 500.0) * aspect_y;
         
         engine.register_render_text(font_name.to_string(), text.to_string(), color, (pos_x, pos_y), font_size);
     }

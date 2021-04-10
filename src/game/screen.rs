@@ -9,7 +9,6 @@ pub struct Screen {
     position: (f32, f32),
     scale: (f32, f32),
     background: String,
-    adjust_to_screen: bool,
     text_elements: Vec<TextElement>,
     texture_elements: Vec<TextureElement>,
     event_text_elements: Vec<TextElement>,
@@ -19,7 +18,7 @@ pub struct Screen {
 
 impl Screen {
     pub fn open(&mut self, engine: &mut engine::Engine, paths: Config) {
-        let mut gui = gui::Gui::new(self.scale, self.position, self.adjust_to_screen);
+        let mut gui = gui::Gui::new(self.scale, self.position);
         
         if self.background != "" {
             gui.add_background(engine, &self.background[..], (0.0, 0.0),(1000.0, 1000.0));
