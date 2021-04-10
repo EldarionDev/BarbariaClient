@@ -68,24 +68,35 @@ impl Screen {
     }
 
     pub fn mouse_clicked(&self, listener: &mut Listener, cursor_pos: (f64, f64), screen_size: (f32, f32)) {
-        /* TODO: Fix calculation to new orthogonal matrix */
-        let cursor_pos = (cursor_pos.0 as f32, screen_size.1 - cursor_pos.1 as f32);
-        let gui_position = self.gui.clone().unwrap().position.clone();
-        let gui_size = self.gui.clone().unwrap().size.clone();
+        /* y-Coordinates are upside down */
+        let cursor_pos = (cursor_pos.0, screen_size.1 as f64 - cursor_pos.1);
 
+        let aspect_x = (screen_size.0 / 1000.0) as f64;
+        let aspect_y = (screen_size.1 / 1000.0) as f64;
 
-        /* Check if mouse-click is within screen */
-        let x = (1000.0 / screen_size.0) * cursor_pos.0;
-        let y = (1000.0 / screen_size.1) * cursor_pos.1;
-        if self.position.0 > x || x > (self.position.0 + self.scale.0) || self.position.1 > y || y > (self.position.1 + self.scale.1) {
-            return;
-        }
-        
-        
-        for element in (&self.texture_elements).iter().rev() {
-            let mut x = 0;
-            let mut y = 0;
+        /* Transform mouse coordinates to screen coordinates */
+        let cursor_pos = ((cursor_pos.0 / aspect_x) as f32 , (cursor_pos.1 / aspect_y) as f32);
+
+        /* Check if mouse is in range of GUI */
+        if cursor_pos.0 >= self.position.0 && cursor_pos.0 <= self.position.0 + self.scale.0 && cursor_pos.1 >= self.position.1 && cursor_pos.1 <= self.position.1 + self.scale.1 {
             
+            for element in (&self.texture_elements).iter().rev() {
+                let element_x = (element.position.0 - self.position.0) *  (self.scale.0 / 1000.0) + self.position.0;
+                let element_x_end = (element.position.0 - self.position.0) *  (self.scale.0 / 1000.0) + self.position.0 + (element.size.0 * (self.scale.0 / 1000.0));
+                let element_y = (element.position.1 - self.position.1) *  (self.scale.1 / 1000.0) + self.position.1;
+                let element_y_end = (element.position.1 - self.position.1) *  (self.scale.1 / 1000.0) + self.position.1 + (element.size.1 * (self.scale.1 / 1000.0));
+
+                if element_x < cursor_pos.0 && cursor_pos.0 < element_x_end {
+                    if element_y < cursor_pos.1 && cursor_pos.1 < element_y_end {
+                        for e in element.event_codes.iter() {
+                            if e == "" {
+                                continue;
+                            }
+                            listener.event_codes.push(e.to_string());
+                        }
+                    }
+                } 
+            }
         }
     }
 }
