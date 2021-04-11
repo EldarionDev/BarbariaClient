@@ -1,6 +1,13 @@
 Mordor, or the Black Land, is a land where the shadows lie. 
-It is the domain of the Dark Lord Sauron, where he attempts to rule Middle-earth. 
-Surrounded by three enormous mountain ranges, it was well-fortified against potential invasion. 
-Mordor’s Uruk-Hai are a new breed of Orc; they are faster and can travel in daylight, much like the monstrous Olog-Hai. 
-Also known as Black Uruks, the armies of Mordor are more dangerous than ever, as lowly Orcs, 
-strong Uruks, towering Trolls march to war lead by the cruel Black Numenorean elite.
+It is the domain of the Dark Lord Sauron, 
+where he attempts to rule Middle-earth. 
+Surrounded by three enormous mountain ranges, 
+it was well-fortified against potential invasion. 
+Mordor’s Uruk-Hai are a new breed of Orc; 
+they are faster and can travel in daylight, 
+much like the monstrous Olog-Hai. 
+Also known as Black Uruks, 
+the armies of Mordor are more dangerous than ever,
+as lowly Orcs, 
+strong Uruks, towering Trolls march to war 
+lead by the cruel Black Numenorean elite.

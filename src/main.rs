@@ -61,7 +61,7 @@ fn main() {
         }
 
         game_engine.render_tick();
-        game.borrow_mut().game_tick(&mut game_engine);
+        game.borrow_mut().game_tick(&mut game_engine, &program_config);
     }
 
     game.borrow().save_world();

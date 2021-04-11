@@ -140,7 +140,10 @@ impl Font {
 
                 let current_char = match self.font_cache.get(&c) {
                     Some(i) => i,
-                    None => panic!("Could not find char in character map.")
+                    None => {
+                        //println!("[WARNING] {} is not in character map", c);
+                        continue;
+                    }
                 };
 
                 let x_position = position.0 + current_char.bearing.x * scale;

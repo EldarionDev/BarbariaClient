@@ -13,7 +13,7 @@ pub struct Screen {
     texture_elements: Vec<TextureElement>,
     event_text_elements: Vec<TextElement>,
     event_texture_elements: Vec<TextureElement>,
-    gui: Option<gui::Gui>
+    gui: Option<gui::Gui>,
 }
 
 impl Screen {
@@ -61,10 +61,18 @@ impl Screen {
         self.gui.as_mut().unwrap().add_element(engine, &texture_element.name, texture_element.position, texture_element.size)
     }
 
-    pub fn render_event_text(&mut self, engine: &mut engine::Engine, element_name: &str) {
+    pub fn render_event_text(&mut self, engine: &mut engine::Engine, element_name: &str, paths: &Config) {
         let index: usize = element_name.parse().expect("Not a valid index");
         let text_element = self.event_text_elements.get(index).unwrap();
-        self.gui.as_mut().unwrap().add_text(engine, text_element.position, text_element.fontsize, &text_element.font, &text_element.text, text_element.color);
+        for i in paths.resource_manager.get_assets("texts") {
+            let name = i.split('/').last().unwrap().to_string();
+            let name = name.split('.').next().unwrap();
+            if name == text_element.text {
+                let file_c = std::fs::read_to_string(i).expect("Could not read text file.");
+                self.gui.as_mut().unwrap().add_text(engine, text_element.position, text_element.fontsize, &text_element.font[..], &file_c, text_element.color);
+                break;
+            }
+        }
     }
 
     pub fn mouse_clicked(&self, listener: &mut Listener, cursor_pos: (f64, f64), screen_size: (f32, f32)) {

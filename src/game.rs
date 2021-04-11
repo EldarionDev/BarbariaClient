@@ -82,7 +82,7 @@ impl Game {
         }
     }
 
-    pub fn game_tick(&mut self, engine: &mut engine::Engine) {
+    pub fn game_tick(&mut self, engine: &mut engine::Engine, paths: &Config) {
         let event_codes = self.listener.event_codes.clone();
         for s in &event_codes[..] {
             if s == "" {
@@ -107,13 +107,14 @@ impl Game {
             }
 
             if s.starts_with("render") {
-                let mut split_string = s.split(" ");
-                match split_string.find(|&x| x == "texture") {
-                    Some(_) => {self.screens.last_mut().unwrap().render_event_texture(engine, split_string.last().unwrap()); continue;},
+                let mut split_string1 = s.split(" ");
+                let mut split_string2 = s.split(" ");
+                match split_string1.find(|&x| x == "texture") {
+                    Some(_) => {self.screens.last_mut().unwrap().render_event_texture(engine, split_string1.last().unwrap()); continue;},
                     None => {}
                 };
-                match split_string.find(|&x| x == "text") {
-                    Some(_) => {self.screens.last_mut().unwrap().render_event_text(engine, split_string.last().unwrap()); continue;},
+                match split_string2.find(|&x| x == "text") {
+                    Some(_) => {self.screens.last_mut().unwrap().render_event_text(engine, split_string2.last().unwrap(), paths); continue;},
                     None => panic!("Neither texture nor text specified")
                 }
             }

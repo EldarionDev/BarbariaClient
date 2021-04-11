@@ -1,9 +1,17 @@
-Khazad-Dum, latterly known as Moria, is the grandest and most famed of the Dwarven mansions. 
-For many thousands of years this kingdom thrived beneath the heart of the Misty Mountains. 
-It was founded in the ancient days, when Durin the Deathless first awoke at Mount Gundabad 
-and ventured to the valley of Azanulbizar where he gazed into Mirrormere (or Kheled-zaram). 
-During the Second Age, Khazad-Dum was very prosperous for it was enriched by many peoples and craft. 
-The most well-known of these friendships was with Celebrimbor’s neighbouring realm of Eregion, 
-and the most well-known workings of these close allies was the magical Ithildin-laiden Doors of Durin upon the western gate of the kingdom. 
-When this kingdom was at its utmost bountiful, its armies were too. 
-Great regiments of Dwarven warriors were assembled to protect the vast wealth of Khazad-Dum from all who dare to gaze upon it.
+Khazad-Dum, latterly known as Moria, 
+is the grandest and most famed of the Dwarven mansions. 
+For many thousands of years this kingdom thrived 
+beneath the heart of the Misty Mountains. 
+It was founded in the ancient days, when Durin the Deathless 
+first awoke at Mount Gundabad and ventured 
+to the valley of Azanulbizar where he gazed into Mirrormere 
+(or Kheled-zaram). During the Second Age, 
+Khazad-Dum was very prosperous for it was enriched by 
+many peoples and craft. The most well-known 
+of these friendships was with Celebrimbor’s neighbouring 
+realm of Eregion, and the most well-known workings 
+of these close allies was the magical Ithildin-laiden 
+Doors of Durin upon the western gate of the kingdom. 
+As the kingdom was beatiful, so were its armies.
+Regiments of Dwarven warriors were assembled to protect 
+the vast wealth of Khazad-Dum from all who dare to gaze upon it.
