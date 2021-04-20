@@ -22,7 +22,8 @@ pub struct Game {
     screens: Vec<screen::Screen>,
     open_screens: Vec<screen::Screen>,
     listener: listener::Listener,
-    screen_size: (f32, f32)
+    screen_size: (f32, f32),
+    event_string: String
 }
 
 impl Game {
@@ -53,7 +54,8 @@ impl Game {
             screens,
             open_screens: Vec::new(),
             listener: listener::Listener::new(),
-            screen_size
+            screen_size,
+            event_string: "".to_string()
         }
     }
 
@@ -66,7 +68,8 @@ impl Game {
         }
     }
 
-    pub fn load_world(&self) {
+    pub fn load_world(&self, player_faction_name: &str) {
+        println!("Starting game, player has chosen: {}", player_faction_name);
         for faction_file in self.paths.resource_manager.get_world_data("factions") {
             let faction_file_content = match fs::read_to_string(faction_file) {
                 Ok(f) => f,
@@ -117,6 +120,16 @@ impl Game {
                     Some(_) => {self.screens.last_mut().unwrap().render_event_text(engine, split_string2.last().unwrap(), paths); continue;},
                     None => panic!("Neither texture nor text specified")
                 }
+            }
+
+            if s.starts_with("set") {
+                let split_string = s.split(" ");
+                self.event_string = split_string.last().expect("set command used without parameters.").to_string();
+            }
+
+            if s.starts_with("play") {
+                if self.event_string == "" {panic!("Used play command without setting the player faction.")}
+                self.load_world(&self.event_string);
             }
 
             match &mut self.map {

@@ -1,0 +1,8 @@
+{
+    "animation": "2d_default",
+    "camera": "2d_default",
+    "model": "2d_default",
+    "projection": "2d_default",
+    "shader": "2d_default_gui",
+    "texture": "backward_button"
+}

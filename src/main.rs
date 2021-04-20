@@ -41,8 +41,6 @@ fn main() {
 
     //game_engine.open_title_screen();
 
-    game.borrow_mut().load_world();
-
     game_engine.event_handler.register_event_object(game.clone());
     //game_engine.register_render_text("prince_valiant".to_string(), "testtesttesttesttesttest".to_string(), (0.9, 0.9, 0.9), (250.0, 250.0), 1.0);
 
